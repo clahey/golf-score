@@ -3,10 +3,13 @@ package net.clahey.golfscore.data.database
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Delete
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Insert
+import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Relation
 import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -63,7 +66,19 @@ data class GameToPlayer(val game: Int, val player: Int)
 @Entity(tableName = "scores", primaryKeys = ["game", "player", "hole"])
 data class Score(val game: Int, val player: Int, val hole: Int, val score: Int)
 
-data class GameWithPlayers(val game: Game, val players: List<Player>)
+@Entity(tableName = "game_scores", primaryKeys = ["game", "player"])
+data class GameScore(val game: Int, val player: Int, val score: Int)
+
+data class GameWithPlayersAndScores(
+    @Embedded val game: Game,
+    @Relation(
+        parentColumn = "id", entityColumn = "id", associateBy = Junction(
+            GameToPlayer::class, parentColumn = "game", entityColumn = "player"
+        )
+    ) val players: List<Player>,
+    @Relation(parentColumn = "id", entityColumn = "game")
+    val scores: List<GameScore>
+)
 
 @Dao
 interface GameDao {
@@ -98,31 +113,15 @@ interface GameDao {
     fun getAll(): Flow<List<Game>>
 
     @Query(
-        "SELECT * from games " + "join players, game_to_player " + "where games.id = game_to_player.game and players.id = game_to_player.player"
+        "SELECT * from games"
     )
-    fun getAllWithPlayersInternal(): Flow<Map<Game, List<Player>>>
-
-    fun getAllWithPlayers(): Flow<List<GameWithPlayers>> = getAllWithPlayersInternal().map {
-        buildList {
-            for ((game, players) in it) {
-                add(GameWithPlayers(game, players))
-            }
-        }
-    }
+    fun getAllWithPlayersAndScores(): Flow<List<GameWithPlayersAndScores>>
 
     @Query(
-        "SELECT * from games JOIN players, game_to_player " + "where games.id = :gameId " + "and games.id = game_to_player.game " + "and players.id = game_to_player.player"
+        "SELECT * from games where games.id = :gameId"
     )
-    fun getWithPlayersInternal(gameId: Int): Flow<Map<Game, List<Player>>>
+    fun getWithPlayersAndScores(gameId: Int): Flow<GameWithPlayersAndScores>
 
-    fun getWithPlayers(gameId: Int): Flow<GameWithPlayers?> = getWithPlayersInternal(gameId).map {
-        if (it.size == 1) {
-            for ((game, players: List<Player>) in it) {
-                return@map (GameWithPlayers(game, players))
-            }
-        }
-        null
-    }
 
 
     @Query("SELECT * from games LIMIT 1")
@@ -158,9 +157,26 @@ interface GameDao {
     fun setScore(game: Int, player: Int, hole: Int, score: Int)
 
     @Query(
+        "INSERT OR REPLACE INTO game_scores (game, player, score)" + "values (:game, :player, :score)"
+    )
+    fun setScore(game: Int, player: Int, score: Int)
+
+    @Transaction
+    fun setScore(game: Int, player: Int, hole: Int, score: Int, total: Int) {
+        setScore(game, player, hole, score)
+        setScore(game, player, total)
+    }
+
+    @Query(
         "DELETE FROM scores where game = :game and hole = :hole and player = :player"
     )
     fun clearScore(game: Int, player: Int, hole: Int)
+
+    @Transaction
+    fun clearScore(game: Int, player: Int, hole: Int, total: Int) {
+        clearScore(game, player, hole)
+        setScore(game, player, total)
+    }
 
     @Query(
         "UPDATE games SET " + "title = :title, " + "holeCount = :holeCount where id = :gameId"

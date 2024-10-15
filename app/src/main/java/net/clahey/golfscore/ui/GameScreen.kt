@@ -73,13 +73,13 @@ fun GameScreen(
         Column(Modifier.padding(innerPadding)) {
             GameScoreDisplay(
                 gameConfig,
-                gameUiState,
+                gameUiState.holes,
                 onShowScoreUpdateDialog = { player: Int, hole: Int ->
                     onChangeScore(
                         gameConfig.players[player].name,
                         hole,
                         player,
-                        gameUiState[hole].getPlayerScore(player)
+                        gameUiState.holes[hole].getPlayerScore(player)
                     )
                 })
         }

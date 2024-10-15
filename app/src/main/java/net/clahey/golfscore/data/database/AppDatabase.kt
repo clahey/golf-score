@@ -7,9 +7,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [Player::class, Game::class, GameToPlayer::class, Score::class],
-    version = 1,
-    exportSchema = true
+    entities = [Player::class, Game::class, GameToPlayer::class, Score::class, GameScore::class],
+    version = 2,
+    exportSchema = true,
+    autoMigrations = [AutoMigration(from = 1, to = 2)],
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun playerDao(): PlayerDao

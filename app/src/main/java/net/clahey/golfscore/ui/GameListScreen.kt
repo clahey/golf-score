@@ -2,7 +2,6 @@ package net.clahey.golfscore.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -55,17 +54,17 @@ fun GameListScreen(
             LazyColumn {
                 for (game in gameListState.games) {
                     item {
-                        Row(Modifier.clickable(onClick = { onNavigateToGame(game.id) })) {
+                        Column(Modifier.clickable(onClick = { onNavigateToGame(game.id) })) {
                             Text(
                                 game.title,
-                                modifier = Modifier.alignByBaseline(),
                                 style = MaterialTheme.typography.titleMedium
                             )
-                            Text(
-                                "(${game.players.joinToString(", ") { it.name }})",
-                                modifier = Modifier.alignByBaseline(),
-                                style = MaterialTheme.typography.titleSmall
-                            )
+                            for (player in game.players) {
+                                Text(
+                                    "(${player.name} : ${player.score}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         }
                     }
                 }

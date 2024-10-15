@@ -8,15 +8,16 @@ import net.clahey.golfscore.data.database.AppDatabase
 
 class GameListViewModel(application: Application) : AndroidViewModel(application) {
 
-    data class PlayerData(val id: Int, val name: String)
+    data class PlayerData(val id: Int, val name: String, val score: Int)
     data class GameData(val id: Int, val title: String, val players: List<PlayerData>)
     data class AppState(val games: List<GameData>)
 
     private val db = AppDatabase.getInstance(application.applicationContext)
 
-    val appState: Flow<AppState> = db.gameDao().getAllWithPlayers().map {
+    val appState: Flow<AppState> = db.gameDao().getAllWithPlayersAndScores().map {
         AppState(it.map {
-            GameData(it.game.id, it.game.title, it.players.map { PlayerData(it.id, it.name) })
+            val playerScores = buildMap {for (score in it.scores) put(score.player, score.score) }
+            GameData(it.game.id, it.game.title, it.players.map { PlayerData(it.id, it.name, playerScores[it.id] ?: 0) })
         })
     }
 }

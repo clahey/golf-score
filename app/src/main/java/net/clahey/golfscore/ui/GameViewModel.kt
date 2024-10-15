@@ -19,6 +19,7 @@ import net.clahey.golfscore.data.database.Score
 import net.clahey.immutable.copy
 import java.lang.Integer.max
 
+data class GameState (val holes: List<Hole>, val playerScores: Map<Int, Int>)
 
 class GameViewModel(
     application: Application,
@@ -26,9 +27,9 @@ class GameViewModel(
 ) : AndroidViewModel(application) {
     private val db = AppDatabase.getInstance(application.applicationContext)
     val gameId: Int = savedStateHandle.toRoute<net.clahey.golfscore.Game>().id
-    private val _uiState = MutableStateFlow(listOf<Hole>())
-    val uiState: StateFlow<List<Hole>> = _uiState.asStateFlow()
-    val gameConfig: Flow<GameConfig> = db.gameDao().getWithPlayers(gameId).map {
+    private val _uiState = MutableStateFlow(GameState(listOf(), mapOf()))
+    val uiState: StateFlow<GameState> = _uiState.asStateFlow()
+    val gameConfig: Flow<GameConfig> = db.gameDao().getWithPlayersAndScores(gameId).map {
         if (it != null) {
             GameConfig(it.players.map { Player(it.name, it.id) }, it.game.title, it.game.holeCount)
         } else {
@@ -64,36 +65,40 @@ class GameViewModel(
                     holeCount, scores.maxOfOrNull { it.hole }?.plus(1) ?: 0
                 )
             ) { mutableMapOf<Int, Int>() }
+            val totals = mutableMapOf<Int, Int>()
             for (score in scores) {
                 holeMaps[score.hole].put(score.player, score.score)
+                totals[score.player] = totals[score.player] ?: 0 + score.score
             }
             _uiState.update {
-                holeMaps.mapIndexed { index, map -> Hole(map, (index + 1).toString()) }
+                GameState(holeMaps.mapIndexed { index, map -> Hole(map, (index + 1).toString()) }, totals)
             }
         }
     }
 
     fun setScore(player: Int, hole: Int, score: Int) {
         launchDb {
+
             // check parameters
-            db.gameDao().setScore(gameId, player, hole, score)
+            val total = uiState.value.holes.map {it.scores[player] ?: 0}.sum() - (uiState.value.holes[hole].scores[player] ?: 0) + score
+            db.gameDao().setScore(gameId, player, hole, score, total)
             _uiState.update {
-                it.copy(
-                    hole to it[hole].setPlayerScore(player, score)
-                )
+                it.copy(holes = it.holes.copy(
+                    hole to it.holes[hole].setPlayerScore(player, score)),
+                        playerScores = it.playerScores.copy(player to total))
             }
         }
     }
 
     private fun clearScore(playerId: Int, hole: Int) {
-
+        val total = uiState.value.holes.map {it.scores[playerId] ?: 0}.sum() - (uiState.value.holes[hole].scores[playerId] ?: 0)
         launchDb {
             // check parameters
-            db.gameDao().clearScore(gameId, playerId, hole)
+            db.gameDao().clearScore(gameId, playerId, hole, total)
             _uiState.update {
-                it.copy(
-                    hole to it[hole].clearPlayerScore(playerId)
-                )
+                it.copy(holes = it.holes.copy(
+                    hole to it.holes[hole].clearPlayerScore(playerId)),
+                    playerScores = it.playerScores.copy(playerId to total))
             }
         }
     }
