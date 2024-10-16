@@ -97,9 +97,13 @@ fun GameScoreDisplay(
         for (player in gameConfig.players) {
             item(key = Pair(0, player.id)) { Text(player.name, Modifier.outline()) }
         }
+        val runningTotals = mutableMapOf<Int, Int>()
         for (i in 0..<gameConfig.holeCount) {
             val hole = holes.getOrElse(i) { Hole(mapOf(), (i + 1).toString()) }
             item(key = i + 1) { Text(hole.label, Modifier.outline()) }
+            for ((player, score) in hole.scores) {
+                runningTotals[player] = (runningTotals[player] ?: 0) + score
+            }
             for (player in gameConfig.players) {
                 item(key = Pair(i + 1, player.id)) {
                     ScoreDisplay(hole.scores[player.id],
