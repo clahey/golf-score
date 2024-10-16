@@ -61,7 +61,7 @@ fun GameListScreen(
                             )
                             for (player in game.players) {
                                 Text(
-                                    "(${player.name} : ${player.score}",
+                                    "${player.name} : ${player.score}",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }
