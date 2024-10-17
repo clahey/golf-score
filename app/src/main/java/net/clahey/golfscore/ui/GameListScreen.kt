@@ -22,7 +22,6 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -33,6 +32,7 @@ fun GameListScreen(
     onNavigateToGameAdd: () -> Unit,
     gameListViewModel: GameListViewModel = viewModel(),
     onNavigateToPlayerAdd: () -> Unit,
+    onNavigateToPlayerList: () -> Unit,
 ) {
     val gameListState by gameListViewModel.appState.collectAsState(
         initial = GameListViewModel.AppState(
@@ -59,7 +59,10 @@ fun GameListScreen(
             Button(onClick = onNavigateToPlayerAdd) {
                 Text("Add Player", style = MaterialTheme.typography.labelMedium)
             }
-            Text("Players", style = MaterialTheme.typography.titleMedium)
+            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                Text("Players", style = MaterialTheme.typography.titleMedium)
+                Icon(Icons.Filled.Edit, "Edit Players", modifier = Modifier.clickable(onClick = onNavigateToPlayerList))
+            }
             Column {
                 for (player in playersState) {
                     Text(player.name)

@@ -19,6 +19,7 @@ import net.clahey.golfscore.ui.GameConfigScreen
 import net.clahey.golfscore.ui.GameListScreen
 import net.clahey.golfscore.ui.GameScreen
 import net.clahey.golfscore.ui.PlayerConfigScreen
+import net.clahey.golfscore.ui.PlayerListScreen
 import net.clahey.golfscore.ui.SetScoreScreen
 import net.clahey.golfscore.ui.theme.GolfScoreTheme
 
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
 /* Pass null to create a new game. */
 @Serializable data class GameConfigRoute(val id: Int?)
 @Serializable data class SetScoreRoute(val player: String, val hole: Int, val playerId: Int, val score: Int?)
+@Serializable object PlayerListRoute
 
 @Parcelize
 data class ScoreUpdate(val hole: Int, val playerId: Int, val score: Int?) : Parcelable
@@ -55,9 +57,12 @@ fun MainScreen() {
 
     NavHost(navController, startDestination = GameListRoute) {
         composable<GameListRoute> {
-            GameListScreen(onNavigateToGame = { navController.navigate(GameRoute(it)) },
+            GameListScreen(
+                onNavigateToGame = { navController.navigate(GameRoute(it)) },
                 onNavigateToGameAdd = { navController.navigate(GameConfigRoute(null)) },
-                onNavigateToPlayerAdd = { navController.navigate(PlayerConfigRoute(null)) })
+                onNavigateToPlayerAdd = { navController.navigate(PlayerConfigRoute(null)) },
+                onNavigateToPlayerList = { navController.navigate(PlayerListRoute) },
+            )
         }
         composable<GameRoute> {
             GameScreen(onNavigateToGameEdit = { navController.navigate(GameConfigRoute(it)) },
@@ -89,6 +94,7 @@ fun MainScreen() {
                 navController.popBackStack()
             }, onCancel = { navController.popBackStack() })
         }
+        composable<PlayerListRoute> { PlayerListScreen(onNavigateBack = { navController.popBackStack() }) }
     }
 }
 
