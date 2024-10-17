@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Unarchive
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -30,6 +32,8 @@ fun PlayerListScreen(
     onNavigateBack: () -> Boolean,
     onNavigateToPlayerEdit: (Int) -> Unit,
     onNavigateToPlayerAdd: () -> Unit,
+    onNavigateToPlayerArchive: (Int) -> Unit,
+    onNavigateToPlayerUnarchive: (Int) -> Unit,
 ) {
     val players by playerListViewModel.players.collectAsState(initial = listOf())
     Scaffold(floatingActionButton = {
@@ -51,17 +55,30 @@ fun PlayerListScreen(
             })
     }) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            for (player in players) {
+            for (player in players.filter { !it.archived }) {
                 Row {
                     Text(player.name)
                     Icon(
                         Icons.Filled.Edit,
                         "Edit ${player.name}",
                         modifier = Modifier.clickable { onNavigateToPlayerEdit(player.id) })
-//                    Icon(
-//                        Icons.Filled.Archive,
-//                        "Archive ${player.name}",
-//                        modifier = Modifier.clickable { onNavigateToPlayerArchive(player.id) })
+                    Icon(
+                        Icons.Filled.Archive,
+                        "Archive ${player.name}",
+                        modifier = Modifier.clickable { onNavigateToPlayerArchive(player.id) })
+                }
+            }
+            val archived = players.filter { it.archived }
+            if (archived.isNotEmpty()) {
+                Text("Archived", style = MaterialTheme.typography.titleMedium)
+                for (player in players.filter { it.archived }) {
+                    Row {
+                        Text(player.name)
+                        Icon(
+                            Icons.Filled.Unarchive,
+                            "Unarchive ${player.name}",
+                            modifier = Modifier.clickable { onNavigateToPlayerUnarchive(player.id) })
+                    }
                 }
             }
         }

@@ -18,6 +18,7 @@ import kotlinx.serialization.Serializable
 import net.clahey.golfscore.ui.GameConfigScreen
 import net.clahey.golfscore.ui.GameListScreen
 import net.clahey.golfscore.ui.GameScreen
+import net.clahey.golfscore.ui.PlayerArchiveScreen
 import net.clahey.golfscore.ui.PlayerConfigScreen
 import net.clahey.golfscore.ui.PlayerListScreen
 import net.clahey.golfscore.ui.SetScoreScreen
@@ -39,14 +40,25 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Serializable object GameListRoute
-@Serializable data class GameRoute(val id: Int)
+@Serializable
+object GameListRoute
+@Serializable
+data class GameRoute(val id: Int)
+
 /* Pass null to create a new player. */
-@Serializable data class PlayerConfigRoute(val id: Int?)
+@Serializable
+data class PlayerConfigRoute(val id: Int?)
+
 /* Pass null to create a new game. */
-@Serializable data class GameConfigRoute(val id: Int?)
-@Serializable data class SetScoreRoute(val player: String, val hole: Int, val playerId: Int, val score: Int?)
-@Serializable object PlayerListRoute
+@Serializable
+data class GameConfigRoute(val id: Int?)
+@Serializable
+data class SetScoreRoute(val player: String, val hole: Int, val playerId: Int, val score: Int?)
+@Serializable
+object PlayerListRoute
+
+@Serializable
+data class PlayerArchiveRoute(val playerId: Int, val archive: Boolean)
 
 @Parcelize
 data class ScoreUpdate(val hole: Int, val playerId: Int, val score: Int?) : Parcelable
@@ -94,9 +106,20 @@ fun MainScreen() {
                 navController.popBackStack()
             }, onCancel = { navController.popBackStack() })
         }
-        composable<PlayerListRoute> { PlayerListScreen(onNavigateBack = { navController.popBackStack() },
-            onNavigateToPlayerAdd = { navController.navigate(PlayerConfigRoute(null)) },
-            onNavigateToPlayerEdit = {id -> navController.navigate(PlayerConfigRoute(id)) },) }
+        composable<PlayerListRoute> {
+            PlayerListScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToPlayerAdd = { navController.navigate(PlayerConfigRoute(null)) },
+                onNavigateToPlayerEdit = { id -> navController.navigate(PlayerConfigRoute(id)) },
+                onNavigateToPlayerArchive = { id: Int -> navController.navigate(PlayerArchiveRoute(id, true)) },
+                onNavigateToPlayerUnarchive = { id: Int -> navController.navigate(PlayerArchiveRoute(id, false)) },
+            )
+        }
+        dialog<PlayerArchiveRoute> {
+            PlayerArchiveScreen(
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
     }
 }
 

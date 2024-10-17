@@ -12,10 +12,13 @@ import androidx.room.Query
 import androidx.room.Relation
 import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 @Entity(tableName = "players")
-data class Player(val name: String, @PrimaryKey(autoGenerate = true) val id: Int = 0)
+data class Player(
+    val name: String,
+    @ColumnInfo(defaultValue = "FALSE") val archived: Boolean,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+)
 
 @Dao
 interface PlayerDao {
@@ -29,7 +32,7 @@ interface PlayerDao {
     fun insert(player: Player): Long
 
     fun insert(name: String): Int {
-        val rowid = insert(Player(name))
+        val rowid = insert(Player(name, false))
         return lookupId(rowid).id
     }
 
@@ -42,12 +45,11 @@ interface PlayerDao {
     @Query("SELECT * from players")
     fun getAllFlow(): Flow<List<Player>>
 
-    @Delete(entity = Player::class)
-    fun delete(id: Id)
+    @Query("UPDATE players set archived = TRUE where id = :id")
+    fun archivePlayer(id: Int)
 
-    fun delete(id: Int) {
-        delete(Id(id))
-    }
+    @Query("UPDATE players set archived = FALSE where id = :id")
+    fun unarchivePlayer(id: Int)
 
     @Query("UPDATE players set name = :name where id = :id")
     fun updatePlayerConfig(id: Int, name: String)
@@ -61,7 +63,7 @@ data class Game(
 )
 
 @Entity(tableName = "game_to_player", primaryKeys = ["game", "player"])
-data class GameToPlayer(val game: Int, val player: Int)
+data class GameToPlayer(val game: Int, @ColumnInfo(index = true) val player: Int)
 
 @Entity(tableName = "scores", primaryKeys = ["game", "player", "hole"])
 data class Score(val game: Int, val player: Int, val hole: Int, val score: Int)
@@ -77,7 +79,7 @@ data class GameWithPlayersAndScores(
         )
     ) val players: List<Player>,
     @Relation(parentColumn = "id", entityColumn = "game")
-    val scores: List<GameScore>
+    val scores: List<GameScore>,
 )
 
 @Dao
@@ -123,7 +125,6 @@ interface GameDao {
         "SELECT * from games where games.id = :gameId"
     )
     fun getWithPlayersAndScores(gameId: Int): Flow<GameWithPlayersAndScores>
-
 
 
     @Query("SELECT * from games LIMIT 1")
