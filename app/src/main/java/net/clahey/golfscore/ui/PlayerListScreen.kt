@@ -3,6 +3,7 @@ package net.clahey.golfscore.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -22,8 +23,11 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import net.clahey.widgets.compose.ListCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,17 +59,17 @@ fun PlayerListScreen(
             })
     }) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            for (player in players.filter { !it.archived }) {
+            ListCard(players.filter { !it.archived }, Modifier.fillMaxWidth()) { player ->
                 Row {
-                    Text(player.name)
+                    Text(player.name, Modifier.padding(8.dp).align(Alignment.CenterVertically).weight(1f))
                     Icon(
                         Icons.Filled.Edit,
                         "Edit ${player.name}",
-                        modifier = Modifier.clickable { onNavigateToPlayerEdit(player.id) })
+                        modifier = Modifier.align(Alignment.CenterVertically).padding(8.dp).clickable { onNavigateToPlayerEdit(player.id) })
                     Icon(
                         Icons.Filled.Archive,
                         "Archive ${player.name}",
-                        modifier = Modifier.clickable { onNavigateToPlayerArchive(player.id) })
+                        modifier = Modifier.align(Alignment.CenterVertically).padding(8.dp).clickable { onNavigateToPlayerArchive(player.id) })
                 }
             }
             val archived = players.filter { it.archived }

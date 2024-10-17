@@ -13,10 +13,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -27,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import net.clahey.widgets.compose.ListCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,18 +69,8 @@ fun GameListScreen(
                         modifier = Modifier.clickable(onClick = onNavigateToPlayerList)
                     )
                 }
-                OutlinedCard(modifier = Modifier.fillMaxWidth()) {
-                    Column {
-                        var first = true
-                        for (player in playersState) {
-                            if (first) {
-                                first = false
-                            } else {
-                                HorizontalDivider()
-                            }
-                            Text(player.name, modifier = Modifier.padding(8.dp))
-                        }
-                    }
+                ListCard(playersState, Modifier.fillMaxWidth()) {
+                    Text(it.name, modifier = Modifier.padding(8.dp))
                 }
                 LazyColumn {
                     for (game in gameListState.games) {

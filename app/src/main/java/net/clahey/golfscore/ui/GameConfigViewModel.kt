@@ -36,6 +36,7 @@ class GameConfigViewModel(
         it.filter { !it.archived }.map { Player(it.name, it.id) }
     }
     private var gameId: Int? = savedStateHandle.toRoute<net.clahey.golfscore.GameConfigRoute>().id
+    val isAdd = gameId == null
 
     init {
         val id = gameId
