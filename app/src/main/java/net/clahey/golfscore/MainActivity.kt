@@ -94,7 +94,9 @@ fun MainScreen() {
                 navController.popBackStack()
             }, onCancel = { navController.popBackStack() })
         }
-        composable<PlayerListRoute> { PlayerListScreen(onNavigateBack = { navController.popBackStack() }) }
+        composable<PlayerListRoute> { PlayerListScreen(onNavigateBack = { navController.popBackStack() },
+            onNavigateToPlayerAdd = { navController.navigate(PlayerConfigRoute(null)) },
+            onNavigateToPlayerEdit = {id -> navController.navigate(PlayerConfigRoute(id)) },) }
     }
 }
 
