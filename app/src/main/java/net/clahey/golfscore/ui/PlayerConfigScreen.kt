@@ -19,7 +19,11 @@ fun PlayerConfigScreen(
     val playerUiState by playerConfigViewModel.uiState.collectAsState()
     val commitMsg = if (playerConfigViewModel.isAdd) "Create" else "Save"
 
-    DialogCard(listOf(Action(commitMsg, { playerConfigViewModel.commit(); onNavigateBack() }))) {
+    DialogCard(
+        listOf(Action(commitMsg, { playerConfigViewModel.commit(); onNavigateBack() }),
+            Action("Cancel", { onNavigateBack() })
+        )
+    ) {
         Row {
             Text("Name", modifier = Modifier.alignByBaseline())
             TextField(
