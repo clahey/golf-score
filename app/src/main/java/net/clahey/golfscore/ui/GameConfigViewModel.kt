@@ -30,7 +30,7 @@ class GameConfigViewModel(
     val playerList: Flow<List<Player>> = db.playerDao().getAllFlow().map {
         it.map { Player(it.name, it.id) }
     }
-    private var gameId: Int? = savedStateHandle.toRoute<net.clahey.golfscore.GameConfig>().id
+    private var gameId: Int? = savedStateHandle.toRoute<net.clahey.golfscore.GameConfigRoute>().id
 
     init {
         val id = gameId

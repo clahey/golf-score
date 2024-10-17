@@ -45,7 +45,7 @@ class GameViewModel(
     savedStateHandle: SavedStateHandle,
 ) : AndroidViewModel(application) {
     private val db = AppDatabase.getInstance(application.applicationContext)
-    val gameId: Int = savedStateHandle.toRoute<net.clahey.golfscore.Game>().id
+    val gameId: Int = savedStateHandle.toRoute<net.clahey.golfscore.GameRoute>().id
     private val _uiState = MutableStateFlow(GameState(listOf(), mapOf()))
     val uiState: StateFlow<GameState> = _uiState.asStateFlow()
     val gameConfig: Flow<GameConfig> = db.gameDao().getWithPlayersAndScores(gameId).map {

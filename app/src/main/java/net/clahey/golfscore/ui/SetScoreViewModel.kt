@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import net.clahey.golfscore.SetScore
+import net.clahey.golfscore.SetScoreRoute
 import net.clahey.golfscore.data.database.AppDatabase
 
 class SetScoreViewModel(
     application: Application,
     savedStateHandle: SavedStateHandle,
 ) : AndroidViewModel(application) {
-    var setScore: SetScore = savedStateHandle.toRoute<SetScore>()
+    var setScore: SetScoreRoute = savedStateHandle.toRoute<SetScoreRoute>()
 
     private val db = AppDatabase.getInstance(application.applicationContext)
     private val _uiState =

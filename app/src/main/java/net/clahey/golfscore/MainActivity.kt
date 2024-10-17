@@ -38,22 +38,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Serializable
-object GameList
-
-@Serializable
-data class Game(val id: Int)
-
+@Serializable object GameListRoute
+@Serializable data class GameRoute(val id: Int)
 /* Pass null to create a new player. */
-@Serializable
-data class PlayerConfig(val id: Int?)
-
+@Serializable data class PlayerConfigRoute(val id: Int?)
 /* Pass null to create a new game. */
-@Serializable
-data class GameConfig(val id: Int?)
-
-@Serializable
-data class SetScore(val player: String, val hole: Int, val playerId: Int, val score: Int?)
+@Serializable data class GameConfigRoute(val id: Int?)
+@Serializable data class SetScoreRoute(val player: String, val hole: Int, val playerId: Int, val score: Int?)
 
 @Parcelize
 data class ScoreUpdate(val hole: Int, val playerId: Int, val score: Int?) : Parcelable
@@ -62,14 +53,14 @@ data class ScoreUpdate(val hole: Int, val playerId: Int, val score: Int?) : Parc
 fun MainScreen() {
     val navController = rememberNavController()
 
-    NavHost(navController, startDestination = GameList) {
-        composable<GameList> {
-            GameListScreen(onNavigateToGame = { navController.navigate(Game(it)) },
-                onNavigateToGameAdd = { navController.navigate(GameConfig(null)) },
-                onNavigateToPlayerAdd = { navController.navigate(PlayerConfig(null)) })
+    NavHost(navController, startDestination = GameListRoute) {
+        composable<GameListRoute> {
+            GameListScreen(onNavigateToGame = { navController.navigate(GameRoute(it)) },
+                onNavigateToGameAdd = { navController.navigate(GameConfigRoute(null)) },
+                onNavigateToPlayerAdd = { navController.navigate(PlayerConfigRoute(null)) })
         }
-        composable<Game> {
-            GameScreen(onNavigateToGameEdit = { navController.navigate(GameConfig(it)) },
+        composable<GameRoute> {
+            GameScreen(onNavigateToGameEdit = { navController.navigate(GameConfigRoute(it)) },
                 onNavigateBack = { navController.popBackStack() },
                 onAddScoreObserver = {
                     navController.currentBackStackEntry?.savedStateHandle?.getLiveData<ScoreUpdate>(
@@ -84,15 +75,15 @@ fun MainScreen() {
                 onChangeScore = { player, hole, playerId, score ->
                     navController.navigate(
 
-                        SetScore(
+                        SetScoreRoute(
                             player, hole, playerId, score
                         )
                     )
                 })
         }
-        dialog<GameConfig> { GameConfigScreen(onNavigateBack = { navController.popBackStack() }) }
-        dialog<PlayerConfig> { PlayerConfigScreen(onNavigateBack = { navController.popBackStack() }) }
-        dialog<SetScore> {
+        dialog<GameConfigRoute> { GameConfigScreen(onNavigateBack = { navController.popBackStack() }) }
+        dialog<PlayerConfigRoute> { PlayerConfigScreen(onNavigateBack = { navController.popBackStack() }) }
+        dialog<SetScoreRoute> {
             SetScoreScreen(onSetScore = {
                 navController.previousBackStackEntry?.savedStateHandle?.set("score_update", it)
                 navController.popBackStack()

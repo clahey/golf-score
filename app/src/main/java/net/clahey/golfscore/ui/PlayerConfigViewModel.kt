@@ -31,7 +31,7 @@ class PlayerConfigViewModel (
     private val _uiState = MutableStateFlow(PlayerConfigState(true))
     val uiState: StateFlow<PlayerConfigState> = _uiState.asStateFlow()
 
-    private var playerId: Int? = savedStateHandle.toRoute<net.clahey.golfscore.PlayerConfig>().id
+    private var playerId: Int? = savedStateHandle.toRoute<net.clahey.golfscore.PlayerConfigRoute>().id
 
     init {
         val id = playerId
