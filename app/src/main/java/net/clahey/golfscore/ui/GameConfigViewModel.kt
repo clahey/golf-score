@@ -19,8 +19,13 @@ class GameConfigViewModel(
     application: Application,
     savedStateHandle: SavedStateHandle,
 ) : AndroidViewModel(application) {
-    data class GameConfigState(val loading: Boolean, val title: String, val holeCount: Int, val players: List<Int>) {
-        constructor(loading: Boolean): this(loading, "", 18, listOf())
+    data class GameConfigState(
+        val loading: Boolean,
+        val title: String,
+        val holeCount: Int,
+        val players: List<Int>,
+    ) {
+        constructor(loading: Boolean) : this(loading, "", 18, listOf())
     }
 
     private val db = AppDatabase.getInstance(application.applicationContext)
@@ -28,7 +33,7 @@ class GameConfigViewModel(
     val uiState: StateFlow<GameConfigState> = _uiState.asStateFlow()
 
     val playerList: Flow<List<Player>> = db.playerDao().getAllFlow().map {
-        it.map { Player(it.name, it.id) }
+        it.filter { !it.archived }.map { Player(it.name, it.id) }
     }
     private var gameId: Int? = savedStateHandle.toRoute<net.clahey.golfscore.GameConfigRoute>().id
 
@@ -83,9 +88,15 @@ class GameConfigViewModel(
         launchDb {
             val id = gameId
             if (id != null) {
-                db.gameDao().updateGameConfig(id, uiState.value.title, uiState.value.holeCount, uiState.value.players)
+                db.gameDao().updateGameConfig(
+                    id,
+                    uiState.value.title,
+                    uiState.value.holeCount,
+                    uiState.value.players
+                )
             } else {
-                gameId = db.gameDao().insert(uiState.value.title, uiState.value.holeCount, uiState.value.players)
+                gameId = db.gameDao()
+                    .insert(uiState.value.title, uiState.value.holeCount, uiState.value.players)
             }
             _uiState.update { it.copy(loading = false) }
         }
