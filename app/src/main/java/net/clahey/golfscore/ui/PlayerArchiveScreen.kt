@@ -21,8 +21,13 @@ fun PlayerArchiveScreen(
         "Unarchive"
     }
     DialogCard(
-        listOf(Action(commitMsg) { playerArchiveViewModel.commit(); onNavigateBack() },
-            Action("Cancel") { onNavigateBack() })
+        listOf(Action(
+            commitMsg,
+            { playerArchiveViewModel.commit(); onNavigateBack() },
+            isDefault = true
+        ),
+            Action("Cancel", { onNavigateBack() }, isCancel = true)
+        )
     ) {
         if (playerArchiveViewModel.isArchive) {
             Text("Would you like to archive player ${uiState.name}")
