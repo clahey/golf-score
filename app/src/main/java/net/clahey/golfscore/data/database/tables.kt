@@ -112,11 +112,13 @@ interface GameDao {
     @Query("SELECT * from games")
     fun getAll(): Flow<List<Game>>
 
+    @Transaction
     @Query(
         "SELECT * from games"
     )
     fun getAllWithPlayersAndScores(): Flow<List<GameWithPlayersAndScores>>
 
+    @Transaction
     @Query(
         "SELECT * from games where games.id = :gameId"
     )
