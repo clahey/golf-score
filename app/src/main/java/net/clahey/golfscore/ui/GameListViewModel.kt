@@ -21,9 +21,10 @@ class GameListViewModel(application: Application) : AndroidViewModel(application
             GameData(
                 it.game.id,
                 it.game.title,
-                it.players.map { PlayerGameData(it.id, it.name, playerScores[it.id] ?: 0) })
+                it.players.filter { !it.archived }
+                    .map { PlayerGameData(it.id, it.name, playerScores[it.id] ?: 0) })
         })
     }
 
-    val players: Flow<List<Player>> = db.playerDao().getAllFlow()
+    val players: Flow<List<Player>> = db.playerDao().getAllFlow().map { it.filter {!it.archived}}
 }
