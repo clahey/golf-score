@@ -64,11 +64,9 @@ fun SetScoreScreen(
     }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp), shape = RoundedCornerShape(16.dp)
     ) {
-        Column {
+        Column (modifier = Modifier.padding(8.dp)){
+            Text("Set Score", style = MaterialTheme.typography.titleLarge)
             TextField(value = uiState.scoreTextField,
                 onValueChange = { value ->
                     setScoreViewModel.setScoreText(value)
@@ -78,18 +76,16 @@ fun SetScoreScreen(
                     .onKeyEvent {
                         when (it.key) {
                             Key.Enter -> setValue()
-
-
                             Key.Escape -> {
                                 onCancel(); true
                             }
-
                             else -> false
                         }
                     },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 keyboardActions = KeyboardActions(onDone = { setValue() }),
-                singleLine = true
+                singleLine = true,
+                label = { Text("${setScoreViewModel.setScore.player}: Hole ${setScoreViewModel.setScore.hole + 1}") }
             )
             Text(errorString, color = MaterialTheme.colorScheme.error)
             Row {
