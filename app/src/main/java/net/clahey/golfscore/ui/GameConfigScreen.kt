@@ -27,7 +27,7 @@ fun GameConfigScreen(
 
     DialogCard(
         listOf(
-            Action(commitMsg, { gameConfigViewModel.commit() }, isDefault = true),
+            Action(commitMsg, { gameConfigViewModel.commit(); onNavigateBack() }, isDefault = true),
             Action("Cancel", { onNavigateBack() }, isCancel = true)
         )
     ) {
