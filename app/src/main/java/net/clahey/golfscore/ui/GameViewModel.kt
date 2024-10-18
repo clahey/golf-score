@@ -36,6 +36,14 @@ data class Hole(val scores: Map<Int, Int>, val label: String) {
 data class Player(val name: String, val id: Int)
 data class GameConfig(val players: List<Player>, val title: String, val holeCount: Int) {
     constructor() : this(listOf(), "", 0)
+    fun getPlayerById(playerId: Int): Player? {
+        for(player in players) {
+            if (player.id == playerId) {
+                return player
+            }
+        }
+        return null
+    }
 }
 
 data class GameState(val holes: List<Hole>, val playerScores: Map<Int, Int>)
@@ -134,5 +142,4 @@ class GameViewModel(
             }
         }
     }
-
 }

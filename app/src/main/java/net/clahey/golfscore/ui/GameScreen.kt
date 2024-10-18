@@ -14,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -84,6 +85,31 @@ fun GameScreen(
                         gameUiState.holes[hole].getPlayerScore(player)
                     )
                 })
+            RecordButtons(players = gameConfig.players, onRecord = {
+                fun nextHole(playerId: Int): Int {
+                    var retVal = 0
+                    for (i in 0..<gameConfig.holeCount) {
+                        if (gameUiState.holes[i].scores[playerId] != null) {
+                            retVal = retVal + 1
+                        }
+                    }
+                    if (retVal == gameConfig.holeCount) {
+                        retVal = gameConfig.holeCount - 1
+                    }
+                    return retVal
+                }
+
+                val hole = nextHole(it)
+                val player = gameConfig.getPlayerById(it)
+                if (player != null) {
+                    onChangeScore(
+                        player.name,
+                        hole,
+                        it,
+                        gameUiState.holes[hole].getPlayerScore(it)
+                    )
+                }
+            })
         }
     }
 }
@@ -97,7 +123,7 @@ fun GameScoreDisplay(
     LazyVerticalGrid(columns = GridCells.Fixed(gameConfig.players.size + 1), Modifier.outline()) {
         item(key = 0) { TextBox("Hole", textAlign = CenterEnd) }
         for (player in gameConfig.players) {
-            item(key = Pair(0, player.id)) { TextBox(player.name,) }
+            item(key = Pair(0, player.id)) { TextBox(player.name) }
         }
         val runningTotals = mutableMapOf<Int, Int>()
         for (i in 0..<gameConfig.holeCount) {
@@ -129,6 +155,20 @@ fun ScoreDisplay(score: Int?, runningTotal: Int, onClick: (() -> Unit)?) {
     TextBox(if (score == null) "" else "$score ($runningTotal)", onClick = onClick)
 }
 
+@Composable
+fun RecordButtons(players: List<Player>, onRecord: (Int) -> Unit) {
+    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+        for (player in players) {
+            item {
+                OutlinedButton(onClick = { onRecord(player.id) }) {
+                    Text(player.name)
+                }
+            }
+        }
+
+    }
+}
+
 fun Modifier.outline(): Modifier = border(0.5.dp, SolidColor(Color.Black), RectangleShape)
 
 @Composable
@@ -136,7 +176,7 @@ fun TextBox(
     text: String,
     boxModifier: Modifier = Modifier,
     textAlign: Alignment? = null,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     val boxModifier = if (onClick != null) {
         boxModifier.clickable(onClick = onClick)
