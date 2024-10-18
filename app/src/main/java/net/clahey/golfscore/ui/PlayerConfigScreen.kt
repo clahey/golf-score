@@ -30,7 +30,8 @@ fun PlayerConfigScreen(
             playerUiState.name,
             playerConfigViewModel::setName,
             label = { Text("Name") },
-            singleLine = true
+            singleLine = true,
+            defaultFocus = true,
         )
     }
 }

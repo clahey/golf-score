@@ -24,9 +24,10 @@ fun GameConfigScreen(
     val playerList by gameConfigViewModel.playerList.collectAsState(initial = listOf())
 
     val commitMsg = if (gameConfigViewModel.isAdd) "Add" else "Save"
+
     DialogCard(
         listOf(
-            Action(commitMsg, { }, isDefault = true),
+            Action(commitMsg, { gameConfigViewModel.commit() }, isDefault = true),
             Action("Cancel", { onNavigateBack() }, isCancel = true)
         )
     ) {
@@ -34,7 +35,8 @@ fun GameConfigScreen(
             gameUiState.title,
             gameConfigViewModel::setTitle,
             label = { Text("Title") },
-            singleLine = true
+            singleLine = true,
+            defaultFocus = true,
         )
         NumberTextField(
             gameUiState.holeCount,
