@@ -169,7 +169,8 @@ fun RecordButtons(players: List<Player>, onRecord: (Int) -> Unit) {
     }
 }
 
-fun Modifier.outline(): Modifier = border(0.5.dp, SolidColor(Color.Black), RectangleShape)
+@Composable
+fun Modifier.outline(): Modifier = border(0.5.dp, MaterialTheme.colorScheme.primary, RectangleShape)
 
 @Composable
 fun TextBox(
