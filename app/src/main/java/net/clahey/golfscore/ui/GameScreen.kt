@@ -26,9 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import net.clahey.golfscore.ScoreUpdate
@@ -77,38 +75,33 @@ fun GameScreen(
         Column(Modifier.padding(innerPadding)) {
             GameScoreDisplay(gameConfig,
                 gameUiState.holes,
-                onShowScoreUpdateDialog = { player: Int, hole: Int ->
+                onShowScoreUpdateDialog = { playerId: Int, hole: Int ->
+                    val player = gameConfig.getPlayerById(playerId)
                     onChangeScore(
-                        gameConfig.players[player].name,
+                        if (player != null) player.name else "",
                         hole,
-                        player,
-                        gameUiState.holes[hole].getPlayerScore(player)
+                        playerId,
+                        gameUiState.holes[hole].getPlayerScore(playerId)
                     )
                 })
-            RecordButtons(players = gameConfig.players, onRecord = {
-                fun nextHole(playerId: Int): Int {
-                    var retVal = 0
-                    for (i in 0..<gameConfig.holeCount) {
-                        if (gameUiState.holes[i].scores[playerId] != null) {
-                            retVal = retVal + 1
-                        }
+            RecordButtons(players = gameConfig.players, onRecord = { playerId ->
+                var nextHole = 0
+                for (i in 0..<gameConfig.holeCount) {
+                    if (gameUiState.holes[i].scores[playerId] != null) {
+                        nextHole = i + 1
                     }
-                    if (retVal == gameConfig.holeCount) {
-                        retVal = gameConfig.holeCount - 1
-                    }
-                    return retVal
+                }
+                if (nextHole == gameConfig.holeCount) {
+                    nextHole = gameConfig.holeCount - 1
                 }
 
-                val hole = nextHole(it)
-                val player = gameConfig.getPlayerById(it)
-                if (player != null) {
-                    onChangeScore(
-                        player.name,
-                        hole,
-                        it,
-                        gameUiState.holes[hole].getPlayerScore(it)
-                    )
-                }
+                val player = gameConfig.getPlayerById(playerId)
+                onChangeScore(
+                    if (player != null) player.name else "",
+                    nextHole,
+                    playerId,
+                    gameUiState.holes[nextHole].getPlayerScore(playerId)
+                )
             })
         }
     }
