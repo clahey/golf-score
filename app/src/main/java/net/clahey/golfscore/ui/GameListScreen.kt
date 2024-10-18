@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
@@ -72,21 +71,18 @@ fun GameListScreen(
                 ListCard(playersState, Modifier.fillMaxWidth()) {
                     Text(it.name, modifier = Modifier.padding(8.dp))
                 }
-                LazyColumn {
-                    for (game in gameListState.games) {
-                        item {
-                            Column(Modifier.clickable(onClick = { onNavigateToGame(game.id) })) {
-                                Text(
-                                    game.title,
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                                for (player in game.players) {
-                                    Text(
-                                        "${player.name} : ${player.score}",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
-                            }
+                Text("Games", style = MaterialTheme.typography.titleLarge)
+                ListCard(gameListState.games, Modifier.fillMaxWidth()) { game ->
+                    Column(Modifier.clickable(onClick = { onNavigateToGame(game.id) }).padding(8.dp).fillMaxWidth()) {
+                        Text(
+                            game.title,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        for (player in game.players) {
+                            Text(
+                                "${player.name} : ${player.score}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
                     }
                 }
