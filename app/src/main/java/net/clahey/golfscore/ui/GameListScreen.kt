@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,6 +35,7 @@ fun GameListScreen(
     onNavigateToGameAdd: () -> Unit,
     gameListViewModel: GameListViewModel = viewModel(),
     onNavigateToPlayerList: () -> Unit,
+    onNavigateToAbout: () -> Unit,
 ) {
     val gameListState by gameListViewModel.appState.collectAsState(
         initial = GameListViewModel.AppState(
@@ -53,6 +56,15 @@ fun GameListScreen(
                 titleContentColor = MaterialTheme.colorScheme.primary,
             ),
             title = { Text("Golf Scorecard") },
+            actions = {
+                IconButton(
+                    onClick = { onNavigateToAbout() }) {
+                    Icon(
+                        Icons.Filled.Info,
+                        "Settings"
+                    )
+                }
+            },
         )
     }) { innerPadding ->
         Box(Modifier.padding(innerPadding)) {
