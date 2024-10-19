@@ -15,6 +15,7 @@ import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 
@@ -27,7 +28,7 @@ fun AboutScreen() {
         link: String,
         block: AnnotatedString.Builder.() -> Unit,
     ) {
-        val link = LinkAnnotation.Url(link, TextLinkStyles(SpanStyle(color = Color.Blue))) {
+        val link = LinkAnnotation.Url(link, TextLinkStyles(SpanStyle(color = MaterialTheme.colorScheme.tertiary, textDecoration = TextDecoration.Underline))) {
             val url = (it as LinkAnnotation.Url).url
             // log some metrics
             uriHandler.openUri(url)
@@ -55,7 +56,7 @@ fun AboutScreen() {
 
         Text(
             buildAnnotatedString {
-                append("Icon based on  ")
+                append("App icon based on  ")
                 withLink("https://creazilla.com/media/clipart/14597/golf-hole") { append("https://creazilla.com/media/clipart/14597/golf-hole") }
             }, Modifier.padding(8.dp)
         )
