@@ -60,7 +60,7 @@ fun GameScreen(
                 IconButton(onClick = { onNavigateBack() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Localized description"
+                        contentDescription = "Back"
                     )
                 }
             }, actions = {
@@ -91,7 +91,7 @@ fun GameScreen(
                         nextHole = i + 1
                     }
                 }
-                if (nextHole == gameConfig.holeCount) {
+                if (nextHole >= gameConfig.holeCount) {
                     nextHole = gameConfig.holeCount - 1
                 }
 
