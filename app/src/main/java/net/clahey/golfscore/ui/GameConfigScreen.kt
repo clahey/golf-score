@@ -2,8 +2,12 @@ package net.clahey.golfscore.ui
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,6 +23,7 @@ import net.clahey.widgets.compose.DialogCardScope
 fun GameConfigScreen(
     onNavigateBack: () -> Unit,
     gameConfigViewModel: GameConfigViewModel = viewModel(),
+    onNavigateToPlayerAdd: () -> Unit,
 ) {
     val gameUiState by gameConfigViewModel.uiState.collectAsState()
     val playerList by gameConfigViewModel.playerList.collectAsState(initial = listOf())
@@ -45,7 +50,6 @@ fun GameConfigScreen(
         )
         for (player in playerList) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(player.name)
                 Checkbox(player.id in gameUiState.players, onCheckedChange = {
                     if (it) {
                         gameConfigViewModel.addPlayer(player.id)
@@ -53,6 +57,13 @@ fun GameConfigScreen(
                         gameConfigViewModel.removePlayer(player.id)
                     }
                 })
+                Text(player.name)
+            }
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            TextButton({onNavigateToPlayerAdd()}) {
+                Icon(Icons.Filled.Add, "Add Player")
+                Text("Add Player")
             }
         }
     }

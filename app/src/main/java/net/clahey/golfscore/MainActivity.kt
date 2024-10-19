@@ -106,7 +106,8 @@ fun MainScreen() {
                 })
         }
         composable<AboutRoute> { AboutScreen() }
-        dialog<GameConfigRoute> { GameConfigScreen(onNavigateBack = { navController.popBackStack() }) }
+        dialog<GameConfigRoute> { GameConfigScreen(onNavigateBack = { navController.popBackStack() },
+            onNavigateToPlayerAdd = { navController.navigate(PlayerConfigRoute(null)) }) }
         dialog<PlayerConfigRoute> { PlayerConfigScreen(onNavigateBack = { navController.popBackStack() }) }
         dialog<SetScoreRoute> {
             SetScoreScreen(onSetScore = {
