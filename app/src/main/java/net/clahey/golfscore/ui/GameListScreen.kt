@@ -23,6 +23,7 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -73,19 +74,26 @@ fun GameListScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Players", style = MaterialTheme.typography.titleLarge)
-                    Icon(
-                        Icons.Filled.Edit,
-                        "Edit Players",
-                        modifier = Modifier.clickable(onClick = onNavigateToPlayerList)
+                    Text(
+                        "Players",
+                        Modifier.align(Alignment.CenterVertically),
+                        style = MaterialTheme.typography.titleLarge
                     )
+                    IconButton(onNavigateToPlayerList, Modifier.align(Alignment.CenterVertically)) {
+                        Icon(Icons.Filled.Edit, "Edit Players")
+                    }
                 }
                 ListCard(playersState, Modifier.fillMaxWidth()) {
                     Text(it.name, modifier = Modifier.padding(8.dp))
                 }
                 Text("Games", style = MaterialTheme.typography.titleLarge)
                 ListCard(gameListState.games, Modifier.fillMaxWidth()) { game ->
-                    Column(Modifier.clickable(onClick = { onNavigateToGame(game.id) }).padding(8.dp).fillMaxWidth()) {
+                    Column(
+                        Modifier
+                            .clickable(onClick = { onNavigateToGame(game.id) })
+                            .padding(8.dp)
+                            .fillMaxWidth()
+                    ) {
                         Text(
                             game.title,
                             style = MaterialTheme.typography.titleMedium

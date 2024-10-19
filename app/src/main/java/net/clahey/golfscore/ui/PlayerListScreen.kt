@@ -61,15 +61,25 @@ fun PlayerListScreen(
         Column(modifier = Modifier.padding(padding)) {
             ListCard(players.filter { !it.archived }, Modifier.fillMaxWidth()) { player ->
                 Row {
-                    Text(player.name, Modifier.padding(8.dp).align(Alignment.CenterVertically).weight(1f))
-                    Icon(
-                        Icons.Filled.Edit,
-                        "Edit ${player.name}",
-                        modifier = Modifier.align(Alignment.CenterVertically).padding(8.dp).clickable { onNavigateToPlayerEdit(player.id) })
-                    Icon(
-                        Icons.Filled.Archive,
-                        "Archive ${player.name}",
-                        modifier = Modifier.align(Alignment.CenterVertically).padding(8.dp).clickable { onNavigateToPlayerArchive(player.id) })
+                    Text(
+                        player.name,
+                        Modifier
+                            .padding(8.dp)
+                            .align(Alignment.CenterVertically)
+                            .weight(1f)
+                    )
+                    IconButton(
+                        onClick = { onNavigateToPlayerEdit(player.id) },
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    ) {
+                        Icon(Icons.Filled.Edit, "Edit ${player.name}")
+                    }
+                    IconButton(
+                        onClick = { onNavigateToPlayerArchive(player.id) },
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    ) {
+                        Icon(Icons.Filled.Archive, "Archive ${player.name}")
+                    }
                 }
             }
             val archived = players.filter { it.archived }
