@@ -10,7 +10,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +32,13 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import net.clahey.golfscore.ScoreUpdate
+
+
+enum class PlayerState {
+    ACTIVE,
+    AHEAD,
+    FINISHED
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,23 +93,46 @@ fun GameScreen(
                         gameUiState.holes[hole].getPlayerScore(playerId)
                     )
                 })
-            RecordButtons(players = gameConfig.players, onRecord = { playerId ->
+            fun nextHole(playerId: Int? = null): Int? {
                 var nextHole = 0
-                for (i in 0..<gameConfig.holeCount) {
-                    if (gameUiState.holes[i].scores[playerId] != null) {
-                        nextHole = i + 1
+                 for (i in 0..<gameConfig.holeCount) {
+                    if (playerId != null) {
+                        if (gameUiState.holes[i].scores[playerId] != null) {
+                            nextHole = i + 1
+                        }
+                    } else {
+                        if (gameConfig.players.all { player -> gameUiState.holes[i].scores[player.id] != null }) {
+                            nextHole = i + 1
+                        }
                     }
                 }
                 if (nextHole >= gameConfig.holeCount) {
-                    nextHole = gameConfig.holeCount - 1
+                    return null
                 }
+                return nextHole
+            }
 
+            val nextHole = nextHole()
+            val playerStates = buildMap<Int, PlayerState> {
+                for (player in gameConfig.players) {
+                    val playerNextHole = nextHole(player.id)
+                    if (playerNextHole == null) {
+                        put(player.id, PlayerState.FINISHED)
+                    } else if (playerNextHole == nextHole) {
+                        put(player.id, PlayerState.ACTIVE)
+                    } else {
+                        put(player.id, PlayerState.AHEAD)
+                    }
+                }
+            }
+            RecordButtons(gameConfig, playerStates, onRecord = { playerId ->
+                val nextHole = nextHole(playerId)
                 val player = gameConfig.getPlayerById(playerId)
                 onChangeScore(
                     if (player != null) player.name else "",
-                    nextHole,
+                    nextHole ?: gameConfig.holeCount - 1,
                     playerId,
-                    gameUiState.holes[nextHole].getPlayerScore(playerId)
+                    gameUiState.holes[nextHole ?: gameConfig.holeCount - 1].getPlayerScore(playerId)
                 )
             })
         }
@@ -149,12 +181,29 @@ fun ScoreDisplay(score: Int?, runningTotal: Int, onClick: (() -> Unit)?) {
 }
 
 @Composable
-fun RecordButtons(players: List<Player>, onRecord: (Int) -> Unit) {
+fun RecordButtons(
+    gameConfig: GameConfig,
+    playerStates: Map<Int, PlayerState>,
+    onRecord: (Int) -> Unit,
+) {
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-        for (player in players) {
+        for (player in gameConfig.players) {
             item {
-                OutlinedButton(onClick = { onRecord(player.id) }) {
-                    Text(player.name)
+                when (playerStates[player.id]) {
+                    PlayerState.ACTIVE ->
+                        Button(onClick = { onRecord(player.id) }) {
+                            Text(player.name)
+                        }
+
+                    PlayerState.AHEAD ->
+                        OutlinedButton(onClick = { onRecord(player.id) }) {
+                            Text(player.name)
+                        }
+
+                    PlayerState.FINISHED, null ->
+                        OutlinedButton(onClick = { onRecord(player.id) }, enabled = false) {
+                            Text(player.name)
+                        }
                 }
             }
         }
