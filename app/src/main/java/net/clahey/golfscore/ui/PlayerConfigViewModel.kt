@@ -13,26 +13,37 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.clahey.golfscore.data.database.AppDatabase
 
-class PlayerConfigViewModel (
+class PlayerConfigViewModel(
     application: Application,
     savedStateHandle: SavedStateHandle,
 ) : AndroidViewModel(application) {
     data class PlayerConfigState(
         val loading: Boolean,
+        val saving: Boolean,
+        val saved: Boolean,
+        val playerId: Int?,
         val name: String,
     ) {
-        constructor(loading: Boolean) : this(loading, "")
+        constructor(loading: Boolean) : this(loading, false, false, null, "")
+
+        val isAdd = playerId == null
     }
 
+
     private val db = AppDatabase.getInstance(application.applicationContext)
-    private val _uiState = MutableStateFlow(PlayerConfigState(true))
+    private val _uiState = MutableStateFlow(
+        PlayerConfigState(
+            true,
+            false,
+            false,
+            savedStateHandle.toRoute<net.clahey.golfscore.PlayerConfigRoute>().id,
+            ""
+        )
+    )
     val uiState: StateFlow<PlayerConfigState> = _uiState.asStateFlow()
 
-    private var playerId: Int? = savedStateHandle.toRoute<net.clahey.golfscore.PlayerConfigRoute>().id
-    val isAdd = playerId == null
-
     init {
-        val id = playerId
+        val id = uiState.value.playerId
         if (id == null) {
             _uiState.update {
                 PlayerConfigState(false)
@@ -43,7 +54,13 @@ class PlayerConfigViewModel (
                 if (player == null) {
                     _uiState.update { PlayerConfigState(false) }
                 } else {
-                    _uiState.update { PlayerConfigState(false, player.name) }
+                    _uiState.update {
+                        it.copy(
+                            loading = false,
+                            playerId = player.id,
+                            name = player.name
+                        )
+                    }
                 }
             }
         }
@@ -59,13 +76,14 @@ class PlayerConfigViewModel (
         }
         _uiState.update { it.copy(loading = true) }
         launchDb {
-            val id = playerId
+            var id = uiState.value.playerId
             if (id != null) {
                 db.playerDao().updatePlayerConfig(id, uiState.value.name)
+                _uiState.update { it.copy(saving = false, saved = true) }
             } else {
-                playerId = db.playerDao().insert(uiState.value.name)
+                id = db.playerDao().insert(uiState.value.name)
+                _uiState.update { it.copy(saving = false, saved = true, playerId = id) }
             }
-            _uiState.update { it.copy(loading = false) }
         }
     }
 

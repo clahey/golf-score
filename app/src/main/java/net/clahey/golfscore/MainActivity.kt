@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import net.clahey.golfscore.ui.AboutScreen
+import net.clahey.golfscore.ui.DialogResponseReceiver
 import net.clahey.golfscore.ui.GameConfigScreen
 import net.clahey.golfscore.ui.GameListScreen
 import net.clahey.golfscore.ui.GameScreen
@@ -23,6 +24,7 @@ import net.clahey.golfscore.ui.PlayerArchiveScreen
 import net.clahey.golfscore.ui.PlayerConfigScreen
 import net.clahey.golfscore.ui.PlayerListScreen
 import net.clahey.golfscore.ui.SetScoreScreen
+import net.clahey.golfscore.ui.sendDialogResponse
 import net.clahey.golfscore.ui.theme.GolfScoreTheme
 
 class MainActivity : ComponentActivity() {
@@ -86,16 +88,10 @@ fun MainScreen() {
         composable<GameRoute> {
             GameScreen(onNavigateToGameEdit = { navController.navigate(GameConfigRoute(it)) },
                 onNavigateBack = { navController.popBackStack() },
-                onAddScoreObserver = {
-                    navController.currentBackStackEntry?.savedStateHandle?.getLiveData<ScoreUpdate>(
-                        "score_update"
-                    )?.observeForever(it)
-                },
-                onRemoveScoreObserver = {
-                    navController.currentBackStackEntry?.savedStateHandle?.getLiveData<ScoreUpdate>(
-                        "score_update"
-                    )?.removeObserver(it)
-                },
+                scoreUpdateReceiver = DialogResponseReceiver<ScoreUpdate>(
+                    navController,
+                    "score_update"
+                ),
                 onChangeScore = { player, hole, playerId, score ->
                     navController.navigate(
 
@@ -106,12 +102,25 @@ fun MainScreen() {
                 })
         }
         composable<AboutRoute> { AboutScreen() }
-        dialog<GameConfigRoute> { GameConfigScreen(onNavigateBack = { navController.popBackStack() },
-            onNavigateToPlayerAdd = { navController.navigate(PlayerConfigRoute(null)) }) }
-        dialog<PlayerConfigRoute> { PlayerConfigScreen(onNavigateBack = { navController.popBackStack() }) }
+        dialog<GameConfigRoute> {
+            GameConfigScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToPlayerAdd = { navController.navigate(PlayerConfigRoute(null)) },
+                playerAddResponseListener = DialogResponseReceiver<Int>(
+                    navController,
+                    "player_saved"
+                )
+            )
+        }
+        dialog<PlayerConfigRoute> {
+            PlayerConfigScreen(onComplete = {
+                sendDialogResponse(navController, "player_saved", it)
+                navController.popBackStack()
+            }, onNavigateBack = { navController.popBackStack() })
+        }
         dialog<SetScoreRoute> {
             SetScoreScreen(onSetScore = {
-                navController.previousBackStackEntry?.savedStateHandle?.set("score_update", it)
+                sendDialogResponse(navController, "score_update", it)
                 navController.popBackStack()
             }, onCancel = { navController.popBackStack() })
         }

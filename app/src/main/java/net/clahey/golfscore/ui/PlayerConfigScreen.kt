@@ -2,6 +2,7 @@ package net.clahey.golfscore.ui
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -10,17 +11,29 @@ import net.clahey.widgets.compose.DialogCard
 
 @Composable
 fun PlayerConfigScreen(
+    onComplete: (Int) -> Unit,
     onNavigateBack: () -> Unit,
     playerConfigViewModel: PlayerConfigViewModel = viewModel(),
 ) {
     val playerUiState by playerConfigViewModel.uiState.collectAsState()
-    val commitMsg = if (playerConfigViewModel.isAdd) "Create" else "Save"
+    val commitMsg = if (playerUiState.isAdd) "Create" else "Save"
+
+    if (playerUiState.saved == true) {
+        LaunchedEffect(true) {
+            val id = playerUiState.playerId
+            if (id != null) {
+                onComplete(id)
+            } else {
+                onNavigateBack()
+            }
+        }
+    }
 
     DialogCard(
         listOf(
             Action(
                 commitMsg,
-                { playerConfigViewModel.commit(); onNavigateBack() },
+                { playerConfigViewModel.commit() },
                 isDefault = true
             ),
             Action("Cancel", { onNavigateBack() }, isCancel = true)

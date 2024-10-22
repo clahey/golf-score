@@ -12,7 +12,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -46,19 +44,14 @@ fun GameScreen(
     gameViewModel: GameViewModel = viewModel(),
     onNavigateToGameEdit: (Int) -> Unit,
     onNavigateBack: () -> Unit,
-    onAddScoreObserver: ((ScoreUpdate) -> Unit) -> Unit,
-    onRemoveScoreObserver: ((ScoreUpdate) -> Unit) -> Unit,
+    scoreUpdateReceiver: DialogResponseReceiver<ScoreUpdate>,
     onChangeScore: (String, Int, Int, Int?) -> Unit,
 ) {
     val gameUiState by gameViewModel.uiState.collectAsState()
     val gameConfig by gameViewModel.gameConfig.collectAsState(initial = GameConfig())
 
-    DisposableEffect(true) {
-        onAddScoreObserver(gameViewModel.observer)
-        onDispose {
-            onRemoveScoreObserver(gameViewModel.observer)
-        }
-    }
+    DialogParent(scoreUpdateReceiver, gameViewModel.observer)
+
     Scaffold(topBar = {
         TopAppBar(colors = topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,

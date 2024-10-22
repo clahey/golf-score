@@ -24,11 +24,14 @@ fun GameConfigScreen(
     onNavigateBack: () -> Unit,
     gameConfigViewModel: GameConfigViewModel = viewModel(),
     onNavigateToPlayerAdd: () -> Unit,
+    playerAddResponseListener: DialogResponseReceiver<Int>,
 ) {
     val gameUiState by gameConfigViewModel.uiState.collectAsState()
     val playerList by gameConfigViewModel.playerList.collectAsState(initial = listOf())
 
     val commitMsg = if (gameConfigViewModel.isAdd) "Add" else "Save"
+
+    DialogParent(playerAddResponseListener, gameConfigViewModel.onPlayerAdded)
 
     DialogCard(
         listOf(

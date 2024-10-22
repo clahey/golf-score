@@ -28,6 +28,10 @@ class GameConfigViewModel(
         constructor(loading: Boolean) : this(loading, "", 18, listOf())
     }
 
+    val onPlayerAdded: (Int) -> Unit = {
+        addPlayer(it)
+    }
+
     private val db = AppDatabase.getInstance(application.applicationContext)
     private val _uiState = MutableStateFlow(GameConfigState(true))
     val uiState: StateFlow<GameConfigState> = _uiState.asStateFlow()
@@ -80,6 +84,8 @@ class GameConfigViewModel(
         }
         _uiState.update { it.copy(players = it.players.filter { it != player }) }
     }
+
+
 
     fun commit() {
         if (uiState.value.loading) {
