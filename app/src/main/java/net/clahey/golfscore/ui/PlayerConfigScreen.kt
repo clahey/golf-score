@@ -19,7 +19,7 @@ fun PlayerConfigScreen(
 ) {
     val playerUiState by playerConfigViewModel.uiState.collectAsState()
 
-    if (playerUiState.saved == true) {
+    if (playerUiState.saved) {
         LaunchedEffect(true) {
             val id = playerUiState.playerId
             if (id != null) {

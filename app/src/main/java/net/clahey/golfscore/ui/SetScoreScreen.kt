@@ -2,9 +2,7 @@ package net.clahey.golfscore.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
@@ -27,7 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import net.clahey.golfscore.R
 import net.clahey.golfscore.ScoreUpdate
 
@@ -65,8 +62,7 @@ fun SetScoreScreen(
         false
     }
 
-    Card(
-    ) {
+    Card {
         Column (modifier = Modifier.padding(8.dp)){
             Text(stringResource(R.string.set_score_dialog_title), style = MaterialTheme.typography.titleLarge)
             TextField(value = uiState.scoreTextField,

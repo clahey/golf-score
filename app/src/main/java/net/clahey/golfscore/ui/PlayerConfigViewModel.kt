@@ -33,11 +33,11 @@ class PlayerConfigViewModel(
     private val db = AppDatabase.getInstance(application.applicationContext)
     private val _uiState = MutableStateFlow(
         PlayerConfigState(
-            true,
-            false,
-            false,
+            loading = true,
+            saving = false,
+            saved = false,
             savedStateHandle.toRoute<net.clahey.golfscore.PlayerConfigRoute>().id,
-            ""
+            name = ""
         )
     )
     val uiState: StateFlow<PlayerConfigState> = _uiState.asStateFlow()

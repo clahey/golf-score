@@ -8,7 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
@@ -28,12 +27,12 @@ fun AboutScreen() {
         link: String,
         block: AnnotatedString.Builder.() -> Unit,
     ) {
-        val link = LinkAnnotation.Url(link, TextLinkStyles(SpanStyle(color = MaterialTheme.colorScheme.tertiary, textDecoration = TextDecoration.Underline))) {
+        val linkAnnotation = LinkAnnotation.Url(link, TextLinkStyles(SpanStyle(color = MaterialTheme.colorScheme.tertiary, textDecoration = TextDecoration.Underline))) {
             val url = (it as LinkAnnotation.Url).url
             // log some metrics
             uriHandler.openUri(url)
         }
-        withLink(link) {
+        withLink(linkAnnotation) {
             block()
         }
     }

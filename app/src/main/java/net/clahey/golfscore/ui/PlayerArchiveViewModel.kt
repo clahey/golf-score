@@ -6,14 +6,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.clahey.golfscore.data.database.AppDatabase
-import net.clahey.golfscore.ui.PlayerConfigViewModel.PlayerConfigState
 
 class PlayerArchiveViewModel(
     application: Application,

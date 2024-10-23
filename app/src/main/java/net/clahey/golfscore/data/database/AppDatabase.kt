@@ -17,7 +17,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun gameDao(): GameDao
 
     companion object {
-        private const val Database_NAME = "golf_scores.db"
+        private const val DATABASE_NAME = "golf_scores.db"
 
         /**
          * As we need only one instance of db in our app will use to store
@@ -33,7 +33,7 @@ abstract class AppDatabase : RoomDatabase() {
 
                 if (instance == null) {
                     instance = Room.databaseBuilder(
-                        context.applicationContext, AppDatabase::class.java, Database_NAME
+                        context.applicationContext, AppDatabase::class.java, DATABASE_NAME
                     )  .fallbackToDestructiveMigration().build()
 
                     INSTANCE = instance

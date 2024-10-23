@@ -80,7 +80,7 @@ fun GameScreen(
                 onShowScoreUpdateDialog = { playerId: Int, hole: Int ->
                     val player = gameConfig.getPlayerById(playerId)
                     onChangeScore(
-                        if (player != null) player.name else "",
+                        player?.name ?: "",
                         hole,
                         playerId,
                         gameUiState.holes[hole].getPlayerScore(playerId)
@@ -106,26 +106,30 @@ fun GameScreen(
             }
 
             val nextHole = nextHole()
-            val playerStates = buildMap<Int, PlayerState> {
+            val playerStates = buildMap {
                 for (player in gameConfig.players) {
                     val playerNextHole = nextHole(player.id)
-                    if (playerNextHole == null) {
-                        put(player.id, PlayerState.FINISHED)
-                    } else if (playerNextHole == nextHole) {
-                        put(player.id, PlayerState.ACTIVE)
-                    } else {
-                        put(player.id, PlayerState.AHEAD)
+                    when (playerNextHole) {
+                        null -> {
+                            put(player.id, PlayerState.FINISHED)
+                        }
+                        nextHole -> {
+                            put(player.id, PlayerState.ACTIVE)
+                        }
+                        else -> {
+                            put(player.id, PlayerState.AHEAD)
+                        }
                     }
                 }
             }
             RecordButtons(gameConfig, playerStates, onRecord = { playerId ->
-                val nextHole = nextHole(playerId)
+                val hole = nextHole(playerId) ?: (gameConfig.holeCount - 1)
                 val player = gameConfig.getPlayerById(playerId)
                 onChangeScore(
-                    if (player != null) player.name else "",
-                    nextHole ?: gameConfig.holeCount - 1,
+                    player?.name ?: "",
+                    hole,
                     playerId,
-                    gameUiState.holes[nextHole ?: gameConfig.holeCount - 1].getPlayerScore(playerId)
+                    gameUiState.holes[hole].getPlayerScore(playerId)
                 )
             })
         }
@@ -220,14 +224,14 @@ fun Modifier.outline(): Modifier = border(0.5.dp, MaterialTheme.colorScheme.prim
 @Composable
 fun TextBox(
     text: String,
-    boxModifier: Modifier = Modifier,
+    modifier: Modifier = Modifier,
     textAlign: Alignment? = null,
     onClick: (() -> Unit)? = null,
 ) {
     val boxModifier = if (onClick != null) {
-        boxModifier.clickable(onClick = onClick)
+        modifier.clickable(onClick = onClick)
     } else {
-        boxModifier
+        modifier
     }
     Box(modifier = boxModifier.outline()) {
         val textModifier = if (textAlign != null) {

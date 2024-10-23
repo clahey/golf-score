@@ -33,7 +33,7 @@ fun GameConfigScreen(
     val gameUiState by gameConfigViewModel.uiState.collectAsState()
     val playerList by gameConfigViewModel.playerList.collectAsState(initial = listOf())
 
-    if (gameUiState.saved == true) {
+    if (gameUiState.saved) {
         LaunchedEffect(true) {
             val id = gameUiState.gameId
             if (id != null && gameConfigViewModel.isAdd) {
