@@ -61,12 +61,11 @@ fun PlayerListScreen(
             })
     }) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            ListCard(players.filter { !it.archived }, Modifier.fillMaxWidth()) { player ->
-                Row {
+            ListCard(players.filter { !it.archived }, Modifier.fillMaxWidth()) { player, padding ->
+                Row (Modifier.padding(padding)) {
                     Text(
                         player.name,
                         Modifier
-                            .padding(8.dp)
                             .align(Alignment.CenterVertically)
                             .weight(1f)
                     )

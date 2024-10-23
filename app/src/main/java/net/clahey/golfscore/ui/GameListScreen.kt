@@ -86,16 +86,14 @@ fun GameListScreen(
                             stringResource(R.string.main_edit_players_icon_description))
                     }
                 }
-                ListCard(playersState, Modifier.fillMaxWidth()) {
-                    Text(it.name, modifier = Modifier.padding(8.dp))
-                }
+                ListCard(playersState, Modifier.fillMaxWidth()) { player, padding -> Text(player.name, Modifier.padding(padding)) }
                 Text(stringResource(R.string.main_games_header), style = MaterialTheme.typography.titleLarge)
-                ListCard(gameListState.games, Modifier.fillMaxWidth()) { game ->
+                ListCard(gameListState.games, Modifier.fillMaxWidth()) { game, padding ->
                     Column(
                         Modifier
                             .clickable(onClick = { onNavigateToGame(game.id) })
-                            .padding(8.dp)
                             .fillMaxWidth()
+                            .padding(padding)
                     ) {
                         Text(
                             game.title,
