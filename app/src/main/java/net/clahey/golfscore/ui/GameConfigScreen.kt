@@ -14,8 +14,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.viewmodel.compose.viewModel
+import net.clahey.golfscore.R
 import net.clahey.widgets.compose.Action
 import net.clahey.widgets.compose.DialogCard
 import net.clahey.widgets.compose.DialogCardScope
@@ -31,8 +33,6 @@ fun GameConfigScreen(
     val gameUiState by gameConfigViewModel.uiState.collectAsState()
     val playerList by gameConfigViewModel.playerList.collectAsState(initial = listOf())
 
-    val commitMsg = if (gameConfigViewModel.isAdd) "Add" else "Save"
-
     if (gameUiState.saved == true) {
         LaunchedEffect(true) {
             val id = gameUiState.gameId
@@ -46,23 +46,29 @@ fun GameConfigScreen(
 
     DialogParent(playerAddResponseListener, gameConfigViewModel.onPlayerAdded)
 
+    val commitMsg =
+        if (gameConfigViewModel.isAdd) stringResource(R.string.dialog_add_button) else stringResource(
+            R.string.dialog_save_button
+        )
+
     DialogCard(
         listOf(
-            Action(commitMsg, { gameConfigViewModel.commit() }, isDefault = true),
-            Action("Cancel", { onNavigateBack() }, isCancel = true)
+            Action(commitMsg, { gameConfigViewModel.commit() }, isDefault = true), Action(
+                stringResource(R.string.dialog_cancel_button), { onNavigateBack() }, isCancel = true
+            )
         )
     ) {
         TextFieldHandleDefaults(
             gameUiState.title,
             gameConfigViewModel::setTitle,
-            label = { Text("Title") },
+            label = { Text(stringResource(R.string.game_config_title_label)) },
             singleLine = true,
             defaultFocus = true,
         )
         NumberTextField(
             gameUiState.holeCount,
             gameConfigViewModel::setHoleCount,
-            label = { Text("Hole Count:") },
+            label = { Text(stringResource(R.string.game_config_hole_count_label)) },
         )
         for (player in playerList) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -77,9 +83,9 @@ fun GameConfigScreen(
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            TextButton({onNavigateToPlayerAdd()}) {
-                Icon(Icons.Filled.Add, "Add Player")
-                Text("Add Player")
+            TextButton({ onNavigateToPlayerAdd() }) {
+                Icon(Icons.Filled.Add, null)
+                Text(stringResource(R.string.game_config_add_player_button))
             }
         }
     }

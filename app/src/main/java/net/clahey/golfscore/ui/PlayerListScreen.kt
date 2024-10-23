@@ -25,8 +25,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import net.clahey.golfscore.R
 import net.clahey.widgets.compose.ListCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,18 +44,18 @@ fun PlayerListScreen(
     val players by playerListViewModel.players.collectAsState(initial = listOf())
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = { onNavigateToPlayerAdd() }) {
-            Icon(Icons.Filled.Add, "Add Player")
+            Icon(Icons.Filled.Add, stringResource(R.string.player_list_add_player_icon_description))
         }
     }, topBar = {
         TopAppBar(colors = topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.primary,
-        ), title = { Text("Players") },
+        ), title = { Text(stringResource(R.string.player_list_page_title)) },
             navigationIcon = {
                 IconButton(onClick = { onNavigateBack() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Localized description"
+                        contentDescription = stringResource(R.string.generic_back_icon_description)
                     )
                 }
             })
@@ -72,25 +74,36 @@ fun PlayerListScreen(
                         onClick = { onNavigateToPlayerEdit(player.id) },
                         modifier = Modifier.align(Alignment.CenterVertically)
                     ) {
-                        Icon(Icons.Filled.Edit, "Edit ${player.name}")
+                        Icon(Icons.Filled.Edit,
+                            stringResource(
+                                R.string.player_list_edit_player_icon_description,
+                                player.name
+                            ))
                     }
                     IconButton(
                         onClick = { onNavigateToPlayerArchive(player.id) },
                         modifier = Modifier.align(Alignment.CenterVertically)
                     ) {
-                        Icon(Icons.Filled.Archive, "Archive ${player.name}")
+                        Icon(Icons.Filled.Archive,
+                            stringResource(
+                                R.string.player_list_archive_player_icon_description,
+                                player.name
+                            ))
                     }
                 }
             }
             val archived = players.filter { it.archived }
             if (archived.isNotEmpty()) {
-                Text("Archived", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.player_list_archived_header), style = MaterialTheme.typography.titleMedium)
                 for (player in players.filter { it.archived }) {
                     Row {
                         Text(player.name)
                         Icon(
                             Icons.Filled.Unarchive,
-                            "Unarchive ${player.name}",
+                            stringResource(
+                                R.string.player_list_unarchive_player_icon_description,
+                                player.name
+                            ),
                             modifier = Modifier.clickable { onNavigateToPlayerUnarchive(player.id) })
                     }
                 }

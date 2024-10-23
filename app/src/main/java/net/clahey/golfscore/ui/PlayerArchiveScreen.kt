@@ -4,7 +4,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import net.clahey.golfscore.R
 import net.clahey.widgets.compose.Action
 import net.clahey.widgets.compose.DialogCard
 
@@ -16,9 +18,9 @@ fun PlayerArchiveScreen(
 
     val uiState by playerArchiveViewModel.uiState.collectAsState()
     val commitMsg = if (playerArchiveViewModel.isArchive) {
-        "Archive"
+        stringResource(R.string.player_archive_archive_button)
     } else {
-        "Unarchive"
+        stringResource(R.string.player_archive_unarchive_button)
     }
     DialogCard(
         listOf(Action(
@@ -26,13 +28,13 @@ fun PlayerArchiveScreen(
             { playerArchiveViewModel.commit(); onNavigateBack() },
             isDefault = true
         ),
-            Action("Cancel", { onNavigateBack() }, isCancel = true)
+            Action(stringResource(R.string.dialog_cancel_button), { onNavigateBack() }, isCancel = true)
         )
     ) {
         if (playerArchiveViewModel.isArchive) {
-            Text("Would you like to archive player ${uiState.name}")
+            Text(stringResource(R.string.player_archive_archive_dialog_text, uiState.name))
         } else {
-            Text("Would you like to unarchive player ${uiState.name}")
+            Text(stringResource(R.string.player_archive_unarchive_dialog_text, uiState.name))
         }
     }
 }

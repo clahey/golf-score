@@ -27,8 +27,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import net.clahey.golfscore.R
 import net.clahey.golfscore.ScoreUpdate
 
 
@@ -61,15 +63,15 @@ fun GameScreen(
             navigationIcon = {
                 IconButton(onClick = { onNavigateBack() }) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        stringResource(R.string.game_back_icon_description)
                     )
                 }
             }, actions = {
                 IconButton(onClick = { onNavigateToGameEdit(gameViewModel.gameId) }) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
-                        contentDescription = "Localized description"
+                        contentDescription = stringResource(R.string.main_edit_game_config_icon_description)
                     )
                 }
             })
@@ -139,7 +141,12 @@ fun GameScoreDisplay(
     onShowScoreUpdateDialog: ((Int, Int) -> Unit)? = null,
 ) {
     LazyVerticalGrid(columns = GridCells.Fixed(gameConfig.players.size + 1), Modifier.outline()) {
-        item(key = 0) { TextBox("Hole", textAlign = CenterEnd) }
+        item(key = 0) {
+            TextBox(
+                stringResource(R.string.game_hole_column_header),
+                textAlign = CenterEnd
+            )
+        }
         for (player in gameConfig.players) {
             item(key = Pair(0, player.id)) { TextBox(player.name) }
         }
@@ -160,8 +167,7 @@ fun GameScoreDisplay(
                 item(key = Pair(i + 1, player.id)) {
                     ScoreDisplay(hole.scores[player.id],
                         runningTotal ?: 0,
-                        onClick = onShowScoreUpdateDialog?.let { f -> { f(player.id, i) } }
-                    )
+                        onClick = onShowScoreUpdateDialog?.let { f -> { f(player.id, i) } })
                 }
             }
         }
@@ -170,7 +176,13 @@ fun GameScoreDisplay(
 
 @Composable
 fun ScoreDisplay(score: Int?, runningTotal: Int, onClick: (() -> Unit)?) {
-    TextBox(if (score == null) "" else "$score ($runningTotal)", onClick = onClick)
+    TextBox(
+        if (score == null) "" else stringResource(
+            R.string.game_score_with_running_total,
+            score,
+            runningTotal
+        ), onClick = onClick
+    )
 }
 
 @Composable

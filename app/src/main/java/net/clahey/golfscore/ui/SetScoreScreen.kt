@@ -23,10 +23,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import net.clahey.golfscore.R
 import net.clahey.golfscore.ScoreUpdate
 
 @Composable
@@ -47,7 +49,7 @@ fun SetScoreScreen(
             text.trim().toInt()
         } catch (e: NumberFormatException) {
             valid = false
-            errorString = "Not an Integer"
+            errorString = stringResource(R.string.set_score_non_integer_error_message)
         }
     }
     fun setValue(): Boolean = if (valid) {
@@ -66,7 +68,7 @@ fun SetScoreScreen(
     Card(
     ) {
         Column (modifier = Modifier.padding(8.dp)){
-            Text("Set Score", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.set_score_dialog_title), style = MaterialTheme.typography.titleLarge)
             TextField(value = uiState.scoreTextField,
                 onValueChange = { value ->
                     setScoreViewModel.setScoreText(value)
@@ -79,21 +81,27 @@ fun SetScoreScreen(
                             Key.Escape -> {
                                 onCancel(); true
                             }
+
                             else -> false
                         }
                     },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 keyboardActions = KeyboardActions(onDone = { setValue() }),
                 singleLine = true,
-                label = { Text("${setScoreViewModel.setScore.player}: Hole ${setScoreViewModel.setScore.hole + 1}") }
+                label = { Text(
+                    stringResource(
+                        R.string.set_score_score_label,
+                        setScoreViewModel.setScore.player,
+                        setScoreViewModel.setScore.hole + 1
+                    )) }
             )
             Text(errorString, color = MaterialTheme.colorScheme.error)
             Row {
                 TextButton(onClick = { onCancel() }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.dialog_cancel_button))
                 }
                 TextButton(enabled = valid, onClick = { setValue() }) {
-                    Text("Set Score")
+                    Text(stringResource(R.string.set_score_set_score_button))
                 }
             }
         }

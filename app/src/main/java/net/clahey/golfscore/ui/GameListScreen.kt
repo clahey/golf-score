@@ -25,8 +25,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import net.clahey.golfscore.R
 import net.clahey.widgets.compose.ListCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,7 +50,7 @@ fun GameListScreen(
     )
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = { onNavigateToGameAdd() }) {
-            Icon(Icons.Filled.Add, "Add Game")
+            Icon(Icons.Filled.Add, stringResource(R.string.main_add_game_icon_description))
         }
     }, topBar = {
         TopAppBar(
@@ -56,13 +58,13 @@ fun GameListScreen(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 titleContentColor = MaterialTheme.colorScheme.primary,
             ),
-            title = { Text("Golf Scorecard") },
+            title = { Text(stringResource(R.string.main_page_title)) },
             actions = {
                 IconButton(
                     onClick = { onNavigateToAbout() }) {
                     Icon(
                         Icons.Filled.Info,
-                        "Settings"
+                        stringResource(R.string.main_about_icon_description)
                     )
                 }
             },
@@ -75,18 +77,19 @@ fun GameListScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        "Players",
+                        stringResource(R.string.main_players_header),
                         Modifier.align(Alignment.CenterVertically),
                         style = MaterialTheme.typography.titleLarge
                     )
                     IconButton(onNavigateToPlayerList, Modifier.align(Alignment.CenterVertically)) {
-                        Icon(Icons.Filled.Edit, "Edit Players")
+                        Icon(Icons.Filled.Edit,
+                            stringResource(R.string.main_edit_players_icon_description))
                     }
                 }
                 ListCard(playersState, Modifier.fillMaxWidth()) {
                     Text(it.name, modifier = Modifier.padding(8.dp))
                 }
-                Text("Games", style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.main_games_header), style = MaterialTheme.typography.titleLarge)
                 ListCard(gameListState.games, Modifier.fillMaxWidth()) { game ->
                     Column(
                         Modifier
@@ -100,7 +103,11 @@ fun GameListScreen(
                         )
                         for (player in game.players) {
                             Text(
-                                "${player.name} : ${player.score}",
+                                stringResource(
+                                    R.string.main_game_list_player_plus_score,
+                                    player.name,
+                                    player.score
+                                ),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
