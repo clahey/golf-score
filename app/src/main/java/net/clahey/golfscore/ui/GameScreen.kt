@@ -62,7 +62,7 @@ fun GameScreen(
                 IconButton(onClick = { onNavigateBack() }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        stringResource(R.string.game_back_icon_description)
+                        stringResource(R.string.generic_back_icon_description)
                     )
                 }
             }, actions = {
@@ -141,7 +141,7 @@ fun GameScoreDisplay(
     LazyVerticalGrid(columns = GridCells.Fixed(gameConfig.players.size + 1), Modifier.outline()) {
         item(key = 0) {
             TextBox(
-                stringResource(R.string.game_hole_column_header),
+                stringResource(R.string.game_screen_hole_column_header),
                 textAlign = CenterEnd
             )
         }
@@ -176,7 +176,7 @@ fun GameScoreDisplay(
 fun ScoreDisplay(score: Int?, runningTotal: Int, onClick: (() -> Unit)?) {
     TextBox(
         if (score == null) "" else stringResource(
-            R.string.game_score_with_running_total,
+            R.string.game_screen_score_with_running_total,
             score,
             runningTotal
         ), onClick = onClick

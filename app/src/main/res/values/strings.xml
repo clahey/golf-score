@@ -7,9 +7,8 @@
     <string name="game_config_add_player_button">Add Player</string>
     <string name="game_config_hole_count_label">Hole Count:</string>
     <string name="game_config_title_label">Title</string>
-    <string name="game_back_icon_description">Back</string>
-    <string name="game_hole_column_header">Hole</string>
-    <string name="game_score_with_running_total">%1$s (%2$s)</string>
+    <string name="game_screen_hole_column_header">Hole</string>
+    <string name="game_screen_score_with_running_total">%1$s (%2$s)</string>
     <string name="generic_back_icon_description">Back</string>
     <string name="main_about_icon_description">About</string>
     <string name="main_add_game_icon_description">Add Game</string>
