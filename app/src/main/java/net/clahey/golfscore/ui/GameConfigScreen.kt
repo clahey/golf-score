@@ -104,10 +104,7 @@ fun DialogCardScope.NumberTextField(
             if (asInt != null) {
                 onValueChange(asInt)
             }
-        },
-        modifier = modifier,
-        label = label,
-        keyboardOptions = KeyboardOptions(
+        }, modifier = modifier, label = label, keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number
         )
     )

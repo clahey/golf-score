@@ -35,9 +35,7 @@ import net.clahey.golfscore.ScoreUpdate
 
 
 enum class PlayerState {
-    ACTIVE,
-    AHEAD,
-    FINISHED
+    ACTIVE, AHEAD, FINISHED
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +88,7 @@ fun GameScreen(
                 })
             fun nextHole(playerId: Int? = null): Int? {
                 var nextHole = 0
-                 for (i in 0..<gameConfig.holeCount) {
+                for (i in 0..<gameConfig.holeCount) {
                     if (playerId != null) {
                         if (gameUiState.holes[i].scores[playerId] != null) {
                             nextHole = i + 1
@@ -195,20 +193,20 @@ fun RecordButtons(
         for (player in gameConfig.players) {
             item {
                 when (playerStates[player.id]) {
-                    PlayerState.ACTIVE ->
-                        Button(onClick = { onRecord(player.id) }) {
-                            Text(player.name)
-                        }
+                    PlayerState.ACTIVE -> Button(onClick = { onRecord(player.id) }) {
+                        Text(player.name)
+                    }
 
-                    PlayerState.AHEAD ->
-                        OutlinedButton(onClick = { onRecord(player.id) }) {
-                            Text(player.name)
-                        }
+                    PlayerState.AHEAD -> OutlinedButton(onClick = { onRecord(player.id) }) {
+                        Text(player.name)
+                    }
 
-                    PlayerState.FINISHED, null ->
-                        OutlinedButton(onClick = { onRecord(player.id) }, enabled = false) {
-                            Text(player.name)
-                        }
+                    PlayerState.FINISHED, null -> OutlinedButton(
+                        onClick = { onRecord(player.id) },
+                        enabled = false
+                    ) {
+                        Text(player.name)
+                    }
                 }
             }
         }
