@@ -46,13 +46,13 @@ fun GameScreen(
     gameViewModel: GameViewModel = viewModel(),
     onNavigateToGameEdit: (Int) -> Unit,
     onNavigateBack: () -> Unit,
-    scoreUpdateReceiver: DialogResponseReceiver<ScoreUpdate>,
+    scoreUpdateDialog: DialogWithResponse<ScoreUpdate>,
     onChangeScore: (String, Int, Int, Int?) -> Unit,
 ) {
     val gameUiState by gameViewModel.uiState.collectAsState()
     val gameConfig by gameViewModel.gameConfig.collectAsState(initial = GameConfig())
 
-    DialogParent(scoreUpdateReceiver, gameViewModel.observer)
+    DialogParent(scoreUpdateDialog, gameViewModel.observer)
 
     Scaffold(topBar = {
         TopAppBar(colors = topAppBarColors(

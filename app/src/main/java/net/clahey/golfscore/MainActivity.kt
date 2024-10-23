@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,7 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import net.clahey.golfscore.ui.AboutScreen
-import net.clahey.golfscore.ui.DialogResponseReceiver
+import net.clahey.golfscore.ui.DialogWithResponse
 import net.clahey.golfscore.ui.GameConfigScreen
 import net.clahey.golfscore.ui.GameListScreen
 import net.clahey.golfscore.ui.GameScreen
@@ -24,7 +25,6 @@ import net.clahey.golfscore.ui.PlayerArchiveScreen
 import net.clahey.golfscore.ui.PlayerConfigScreen
 import net.clahey.golfscore.ui.PlayerListScreen
 import net.clahey.golfscore.ui.SetScoreScreen
-import net.clahey.golfscore.ui.sendDialogResponse
 import net.clahey.golfscore.ui.theme.GolfScoreTheme
 
 class MainActivity : ComponentActivity() {
@@ -76,6 +76,9 @@ object AboutRoute
 fun MainScreen() {
     val navController = rememberNavController()
 
+    val playerSavedDialog = remember { DialogWithResponse<Int>("player_saved", navController) }
+    val scoreUpdateDialog = remember { DialogWithResponse<ScoreUpdate>("score_update", navController) }
+
     NavHost(navController, startDestination = GameListRoute) {
         composable<GameListRoute> {
             GameListScreen(
@@ -88,9 +91,7 @@ fun MainScreen() {
         composable<GameRoute> {
             GameScreen(onNavigateToGameEdit = { navController.navigate(GameConfigRoute(it)) },
                 onNavigateBack = { navController.popBackStack() },
-                scoreUpdateReceiver = DialogResponseReceiver<ScoreUpdate>(
-                    navController, "score_update"
-                ),
+                scoreUpdateDialog = scoreUpdateDialog,
                 onChangeScore = { player, hole, playerId, score ->
                     navController.navigate(
 
@@ -105,20 +106,18 @@ fun MainScreen() {
             GameConfigScreen(onNavigateBack = { navController.popBackStack() },
                 onStartGame = { navController.popBackStack(); navController.navigate(GameRoute(it)) },
                 onNavigateToPlayerAdd = { navController.navigate(PlayerConfigRoute(null)) },
-                playerAddResponseListener = DialogResponseReceiver<Int>(
-                    navController, "player_saved"
-                )
+                playerAddDialog = playerSavedDialog
             )
         }
         dialog<PlayerConfigRoute> {
             PlayerConfigScreen(onComplete = {
-                sendDialogResponse(navController, "player_saved", it)
+                playerSavedDialog.sendResponse(it)
                 navController.popBackStack()
             }, onNavigateBack = { navController.popBackStack() })
         }
         dialog<SetScoreRoute> {
             SetScoreScreen(onSetScore = {
-                sendDialogResponse(navController, "score_update", it)
+                scoreUpdateDialog.sendResponse(it)
                 navController.popBackStack()
             }, onCancel = { navController.popBackStack() })
         }

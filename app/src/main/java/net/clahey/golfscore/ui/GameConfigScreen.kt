@@ -27,7 +27,7 @@ fun GameConfigScreen(
     onNavigateBack: () -> Unit,
     onStartGame: (Int) -> Unit,
     onNavigateToPlayerAdd: () -> Unit,
-    playerAddResponseListener: DialogResponseReceiver<Int>,
+    playerAddDialog: DialogWithResponse<Int>,
     gameConfigViewModel: GameConfigViewModel = viewModel(),
 ) {
     val gameUiState by gameConfigViewModel.uiState.collectAsState()
@@ -44,7 +44,7 @@ fun GameConfigScreen(
         }
     }
 
-    DialogParent(playerAddResponseListener, gameConfigViewModel.onPlayerAdded)
+    DialogParent(playerAddDialog, gameConfigViewModel.onPlayerAdded)
 
     val commitMsg =
         if (gameConfigViewModel.isAdd) stringResource(R.string.dialog_add_button) else stringResource(
