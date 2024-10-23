@@ -89,8 +89,7 @@ fun MainScreen() {
             GameScreen(onNavigateToGameEdit = { navController.navigate(GameConfigRoute(it)) },
                 onNavigateBack = { navController.popBackStack() },
                 scoreUpdateReceiver = DialogResponseReceiver<ScoreUpdate>(
-                    navController,
-                    "score_update"
+                    navController, "score_update"
                 ),
                 onChangeScore = { player, hole, playerId, score ->
                     navController.navigate(
@@ -107,8 +106,7 @@ fun MainScreen() {
                 onStartGame = { navController.popBackStack(); navController.navigate(GameRoute(it)) },
                 onNavigateToPlayerAdd = { navController.navigate(PlayerConfigRoute(null)) },
                 playerAddResponseListener = DialogResponseReceiver<Int>(
-                    navController,
-                    "player_saved"
+                    navController, "player_saved"
                 )
             )
         }
@@ -132,16 +130,14 @@ fun MainScreen() {
                 onNavigateToPlayerArchive = { id: Int ->
                     navController.navigate(
                         PlayerArchiveRoute(
-                            id,
-                            true
+                            id, true
                         )
                     )
                 },
                 onNavigateToPlayerUnarchive = { id: Int ->
                     navController.navigate(
                         PlayerArchiveRoute(
-                            id,
-                            false
+                            id, false
                         )
                     )
                 },
