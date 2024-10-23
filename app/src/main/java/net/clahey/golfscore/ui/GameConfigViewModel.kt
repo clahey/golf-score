@@ -21,29 +21,28 @@ class GameConfigViewModel(
 ) : AndroidViewModel(application) {
     data class GameConfigState(
         val loading: Boolean,
-        val title: String,
-        val holeCount: Int,
-        val players: List<Int>,
-    ) {
-        constructor(loading: Boolean) : this(loading, "", 18, listOf())
-    }
+        val title: String = "",
+        val holeCount: Int = 18,
+        val players: List<Int> = listOf(),
+        val gameId: Int? = null,
+        val saving: Boolean = false,
+        val saved: Boolean = false,)
 
     val onPlayerAdded: (Int) -> Unit = {
         addPlayer(it)
     }
 
     private val db = AppDatabase.getInstance(application.applicationContext)
-    private val _uiState = MutableStateFlow(GameConfigState(true))
+    private val _uiState = MutableStateFlow(GameConfigState(true, gameId = savedStateHandle.toRoute<net.clahey.golfscore.GameConfigRoute>().id))
     val uiState: StateFlow<GameConfigState> = _uiState.asStateFlow()
+    val isAdd = uiState.value.gameId == null
 
     val playerList: Flow<List<Player>> = db.playerDao().getAllFlow().map {
         it.filter { !it.archived }.map { Player(it.name, it.id) }
     }
-    private var gameId: Int? = savedStateHandle.toRoute<net.clahey.golfscore.GameConfigRoute>().id
-    val isAdd = gameId == null
 
     init {
-        val id = gameId
+        val id = uiState.value.gameId
         if (id == null) {
             _uiState.update {
                 GameConfigState(false)
@@ -57,7 +56,7 @@ class GameConfigViewModel(
                     val title = game.title
                     val holeCount = game.holeCount
                     val players = db.gameDao().getPlayerIds(id)
-                    _uiState.update { GameConfigState(false, title, holeCount, players) }
+                    _uiState.update { GameConfigState(false, title, holeCount, players, id) }
                 }
             }
         }
@@ -91,9 +90,9 @@ class GameConfigViewModel(
         if (uiState.value.loading) {
             return
         }
-        _uiState.update { it.copy(loading = true) }
+        _uiState.update { it.copy(saving = true) }
         launchDb {
-            val id = gameId
+            val id = uiState.value.gameId
             if (id != null) {
                 db.gameDao().updateGameConfig(
                     id,
@@ -101,11 +100,12 @@ class GameConfigViewModel(
                     uiState.value.holeCount,
                     uiState.value.players
                 )
+                _uiState.update { it.copy(saving = false, saved = true) }
             } else {
-                gameId = db.gameDao()
+                val gameId = db.gameDao()
                     .insert(uiState.value.title, uiState.value.holeCount, uiState.value.players)
+                _uiState.update { it.copy(saving = false, saved = true, gameId = gameId) }
             }
-            _uiState.update { it.copy(loading = false) }
         }
     }
 

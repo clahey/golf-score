@@ -9,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,20 +23,32 @@ import net.clahey.widgets.compose.DialogCardScope
 @Composable
 fun GameConfigScreen(
     onNavigateBack: () -> Unit,
-    gameConfigViewModel: GameConfigViewModel = viewModel(),
+    onStartGame: (Int) -> Unit,
     onNavigateToPlayerAdd: () -> Unit,
     playerAddResponseListener: DialogResponseReceiver<Int>,
+    gameConfigViewModel: GameConfigViewModel = viewModel(),
 ) {
     val gameUiState by gameConfigViewModel.uiState.collectAsState()
     val playerList by gameConfigViewModel.playerList.collectAsState(initial = listOf())
 
     val commitMsg = if (gameConfigViewModel.isAdd) "Add" else "Save"
 
+    if (gameUiState.saved == true) {
+        LaunchedEffect(true) {
+            val id = gameUiState.gameId
+            if (id != null && gameConfigViewModel.isAdd) {
+                onStartGame(id)
+            } else {
+                onNavigateBack()
+            }
+        }
+    }
+
     DialogParent(playerAddResponseListener, gameConfigViewModel.onPlayerAdded)
 
     DialogCard(
         listOf(
-            Action(commitMsg, { gameConfigViewModel.commit(); onNavigateBack() }, isDefault = true),
+            Action(commitMsg, { gameConfigViewModel.commit() }, isDefault = true),
             Action("Cancel", { onNavigateBack() }, isCancel = true)
         )
     ) {
