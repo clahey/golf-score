@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,10 +35,6 @@ import net.clahey.golfscore.R
 import net.clahey.golfscore.ScoreUpdate
 
 
-enum class PlayerState {
-    ACTIVE, AHEAD, FINISHED
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(
@@ -52,28 +49,37 @@ fun GameScreen(
 
     DialogParent(scoreUpdateDialog, gameViewModel.observer)
 
-    Scaffold(topBar = {
-        TopAppBar(colors = topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ), title = { Text(gameConfig.title) },
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                colors = topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                title = { Text(gameConfig.title) },
 
-            navigationIcon = {
-                IconButton(onClick = { onNavigateBack() }) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        stringResource(R.string.generic_back_icon_description)
-                    )
+                navigationIcon = {
+                    IconButton(onClick = { onNavigateBack() }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            stringResource(R.string.generic_back_icon_description)
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { onNavigateToGameEdit(gameViewModel.gameId) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = stringResource(R.string.main_edit_game_config_icon_description)
+                        )
+                    }
                 }
-            }, actions = {
-                IconButton(onClick = { onNavigateToGameEdit(gameViewModel.gameId) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = stringResource(R.string.main_edit_game_config_icon_description)
-                    )
-                }
-            })
-    }) { innerPadding ->
+            )
+        },
+        bottomBar = {
+            BottomAppBar { RecordButtons(gameConfig, gameUiState, onChangeScore) }
+        },
+    ) { innerPadding ->
         Column(Modifier.padding(innerPadding)) {
             GameScoreDisplay(gameConfig,
                 gameUiState.holes,
@@ -86,52 +92,6 @@ fun GameScreen(
                         gameUiState.holes[hole].getPlayerScore(playerId)
                     )
                 })
-            fun nextHole(playerId: Int? = null): Int? {
-                var nextHole = 0
-                for (i in 0..<gameConfig.holeCount) {
-                    if (playerId != null) {
-                        if (gameUiState.holes[i].scores[playerId] != null) {
-                            nextHole = i + 1
-                        }
-                    } else {
-                        if (gameConfig.players.all { player -> gameUiState.holes[i].scores[player.id] != null }) {
-                            nextHole = i + 1
-                        }
-                    }
-                }
-                if (nextHole >= gameConfig.holeCount) {
-                    return null
-                }
-                return nextHole
-            }
-
-            val nextHole = nextHole()
-            val playerStates = buildMap {
-                for (player in gameConfig.players) {
-                    val playerNextHole = nextHole(player.id)
-                    when (playerNextHole) {
-                        null -> {
-                            put(player.id, PlayerState.FINISHED)
-                        }
-                        nextHole -> {
-                            put(player.id, PlayerState.ACTIVE)
-                        }
-                        else -> {
-                            put(player.id, PlayerState.AHEAD)
-                        }
-                    }
-                }
-            }
-            RecordButtons(gameConfig, playerStates, onRecord = { playerId ->
-                val hole = nextHole(playerId) ?: (gameConfig.holeCount - 1)
-                val player = gameConfig.getPlayerById(playerId)
-                onChangeScore(
-                    player?.name ?: "",
-                    hole,
-                    playerId,
-                    gameUiState.holes[hole].getPlayerScore(playerId)
-                )
-            })
         }
     }
 }
@@ -190,25 +150,57 @@ fun ScoreDisplay(score: Int?, runningTotal: Int, onClick: (() -> Unit)?) {
 @Composable
 fun RecordButtons(
     gameConfig: GameConfig,
-    playerStates: Map<Int, PlayerState>,
-    onRecord: (Int) -> Unit,
+    gameUiState: GameState,
+    onChangeScore: (String, Int, Int, Int?) -> Unit,
 ) {
+    fun calculateNextHole(playerId: Int? = null): Int? {
+        var nextHole = 0
+        for (i in 0..<gameConfig.holeCount) {
+            if (playerId != null) {
+                if (gameUiState.holes[i].scores[playerId] != null) {
+                    nextHole = i + 1
+                }
+            } else {
+                if (gameConfig.players.all { player -> gameUiState.holes[i].scores[player.id] != null }) {
+                    nextHole = i + 1
+                }
+            }
+        }
+        return if (nextHole < gameConfig.holeCount) {
+            nextHole
+        } else {
+            null
+        }
+    }
+
+    val nextHole = calculateNextHole()
+
+    fun record(playerId: Int) {
+        val hole = calculateNextHole(playerId) ?: (gameConfig.holeCount - 1)
+        val player = gameConfig.getPlayerById(playerId)
+        onChangeScore(
+            player?.name ?: "",
+            hole,
+            playerId,
+            gameUiState.holes[hole].getPlayerScore(playerId)
+        )
+
+    }
+
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         for (player in gameConfig.players) {
             item {
-                when (playerStates[player.id]) {
-                    PlayerState.ACTIVE -> Button(onClick = { onRecord(player.id) }) {
+                val modifier = Modifier.padding(8.dp, 0.dp)
+                when (calculateNextHole(player.id)) {
+                    null -> OutlinedButton({ }, modifier, enabled = false) {
                         Text(player.name)
                     }
 
-                    PlayerState.AHEAD -> OutlinedButton(onClick = { onRecord(player.id) }) {
+                    nextHole -> Button({ record(player.id) }, modifier) {
                         Text(player.name)
                     }
 
-                    PlayerState.FINISHED, null -> OutlinedButton(
-                        onClick = { onRecord(player.id) },
-                        enabled = false
-                    ) {
+                    else -> OutlinedButton({ record(player.id) }, modifier) {
                         Text(player.name)
                     }
                 }
