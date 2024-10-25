@@ -13,10 +13,11 @@ import androidx.compose.ui.Modifier
 @Composable
 fun SectionWithHeader(
     title: String,
-    actions: @Composable() (RowScope.() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    actions: @Composable (RowScope.() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    Column {
+    Column (modifier){
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
