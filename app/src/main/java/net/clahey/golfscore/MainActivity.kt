@@ -84,6 +84,8 @@ fun MainScreen() {
             GameListScreen(
                 onNavigateToGame = { navController.navigate(GameRoute(it)) },
                 onNavigateToGameAdd = { navController.navigate(GameConfigRoute(null)) },
+                onNavigateToPlayerAdd = { navController.navigate(PlayerConfigRoute(null)) },
+                onNavigateToPlayerEdit = { id -> navController.navigate(PlayerConfigRoute(id)) },
                 onNavigateToPlayerList = { navController.navigate(PlayerListRoute) },
                 onNavigateToAbout = { navController.navigate(AboutRoute) },
             )

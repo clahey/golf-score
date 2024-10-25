@@ -37,9 +37,11 @@ import net.clahey.widgets.compose.SectionWithHeader
 fun GameListScreen(
     onNavigateToGame: (Int) -> Unit,
     onNavigateToGameAdd: () -> Unit,
+    onNavigateToPlayerAdd: () -> Unit,
+    onNavigateToPlayerEdit: (Int) -> Unit,
+    onNavigateToAbout: () -> Unit,
     gameListViewModel: GameListViewModel = viewModel(),
     onNavigateToPlayerList: () -> Unit,
-    onNavigateToAbout: () -> Unit,
 ) {
     val gameListState by gameListViewModel.appState.collectAsState(
         initial = GameListViewModel.AppState(
