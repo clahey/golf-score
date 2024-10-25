@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import androidx.compose.ui.zIndex
+import kotlin.math.max
 
 interface ColumnWithScrimScope {
     fun Modifier.aboveScrim(): Modifier
@@ -47,7 +48,10 @@ fun ColumnWithScrim(
         val paddedConstraints = constraints.offset(-paddingPx * 2, -paddingPx * 2)
         val blockPlaceables = blockMeasurables.map { it.measure(paddedConstraints) }
         val totalWidth = (blockPlaceables.maxOfOrNull { it.width } ?: 0) + paddingPx * 2
-        val totalHeight = blockPlaceables.sumOf { it.height } + paddingPx * 2
+        val totalHeight =
+            blockPlaceables.sumOf { it.height } + paddingPx * 2 + spacing.roundToPx() * max(
+                (blockPlaceables.size - 1), 0
+            )
         val scrimPlaceable = scrimMeasurable?.measure(Constraints.fixed(totalWidth, totalHeight))
         return layout(totalWidth, totalHeight) {
             scrimPlaceable?.place(0, 0)
