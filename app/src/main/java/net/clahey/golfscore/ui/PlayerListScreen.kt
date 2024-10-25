@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import net.clahey.golfscore.R
+import net.clahey.golfscore.data.database.Player
 import net.clahey.widgets.compose.ListCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,62 +107,76 @@ fun PlayerListScreen(
                         }
                     }
                 }
-                val archived = players.filter { it.archived }
-                if (archived.isNotEmpty()) {
-                    ListCard {
-                        item { padding ->
-                            Row(
-                                Modifier
-                                    .padding(padding)
-                                    .clickable {
-                                        playerListViewModel.setArchiveExpanded(!uiState.archiveExpanded)
-                                    }) {
-                                Text(
-                                    stringResource(R.string.player_list_archived_header),
-                                    Modifier
-                                        .weight(1f)
-                                        .align(Alignment.CenterVertically),
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                                IconButton({ playerListViewModel.setArchiveExpanded(!uiState.archiveExpanded) }) {
-                                    if (!uiState.archiveExpanded) {
-                                        Icon(
-                                            Icons.Filled.ExpandMore,
-                                            stringResource(R.string.player_list_show_archived_icon_description)
-                                        )
-                                    } else {
-                                        Icon(
-                                            Icons.Filled.ExpandLess,
-                                            stringResource(R.string.player_list_hide_archived_icon_description)
-                                        )
-                                    }
-                                }
-                            }
-                        }
+                ArchivedPlayers(
+                    players.filter { it.archived },
+                    uiState.archiveExpanded,
+                    playerListViewModel::setArchiveExpanded,
+                    Modifier,
+                    onNavigateToPlayerUnarchive
+                )
+            }
+        }
+    }
+}
 
-                        if (uiState.archiveExpanded) {
-                            items(archived) { player, padding ->
-                                Row(Modifier.padding(padding)) {
-                                    Text(
-                                        player.name,
-                                        Modifier
-                                            .weight(1f)
-                                            .align(Alignment.CenterVertically)
-                                    )
-                                    IconButton(onClick = {
-                                        onNavigateToPlayerUnarchive(player.id)
-                                    }) {
-                                        Icon(
-                                            Icons.Filled.Unarchive,
-                                            stringResource(
-                                                R.string.player_list_unarchive_player_icon_description,
-                                                player.name
-                                            ),
-                                            Modifier.align(Alignment.CenterVertically)
-                                        )
-                                    }
-                                }
-                            }
+@Composable
+internal fun ArchivedPlayers(
+    archivedPlayers: List<Player>,
+    archiveExpanded: Boolean,
+    setArchiveExpanded: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    onNavigateToPlayerUnarchive: (Int) -> Unit,
+) {
+    if (archivedPlayers.isNotEmpty()) {
+        ListCard(modifier) {
+            item { padding ->
+                Row(
+                    Modifier
+                        .padding(padding)
+                        .clickable {
+                            setArchiveExpanded(!archiveExpanded)
+                        }) {
+                    Text(
+                        stringResource(R.string.player_list_archived_header),
+                        Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    IconButton({ setArchiveExpanded(!archiveExpanded) }) {
+                        if (!archiveExpanded) {
+                            Icon(
+                                Icons.Filled.ExpandMore,
+                                stringResource(R.string.player_list_show_archived_icon_description)
+                            )
+                        } else {
+                            Icon(
+                                Icons.Filled.ExpandLess,
+                                stringResource(R.string.player_list_hide_archived_icon_description)
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (archiveExpanded) {
+                items(archivedPlayers) { player, padding ->
+                    Row(Modifier.padding(padding)) {
+                        Text(
+                            player.name,
+                            Modifier
+                                .weight(1f)
+                                .align(Alignment.CenterVertically)
+                        )
+                        IconButton(onClick = {
+                            onNavigateToPlayerUnarchive(player.id)
+                        }) {
+                            Icon(
+                                Icons.Filled.Unarchive, stringResource(
+                                    R.string.player_list_unarchive_player_icon_description,
+                                    player.name
+                                ), Modifier.align(Alignment.CenterVertically)
+                            )
                         }
                     }
                 }
