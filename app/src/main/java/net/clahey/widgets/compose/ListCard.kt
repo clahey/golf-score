@@ -9,23 +9,35 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+class ListCardScope() {
+    internal val items = mutableListOf<@Composable ColumnScope.(PaddingValues) -> Unit>()
+
+    fun item(block: @Composable ColumnScope.(PaddingValues) -> Unit) {
+        items.add(block)
+    }
+    fun <T> items(list: List<T>, block: @Composable ColumnScope.(T, PaddingValues) -> Unit) {
+        items.addAll(list.map{ t -> { padding -> block(t, padding) } })
+    }
+}
+
 @Composable
-fun <T> ListCard(
-    items: List<T>,
+fun ListCard(
     modifier: Modifier = Modifier,
-    block: @Composable ColumnScope.(T, padding: PaddingValues) -> Unit,
+    block: ListCardScope.() -> Unit,
 ) {
     val padding = PaddingValues(8.dp)
+    val scope = ListCardScope()
+    scope.block()
     OutlinedCard(modifier) {
         Column {
             var first = true
-            for (item in items) {
+            for (item in scope.items) {
                 if (first) {
                     first = false
                 } else {
                     HorizontalDivider()
                 }
-                block(item, padding)
+                item(padding)
             }
         }
     }

@@ -77,27 +77,31 @@ fun GameListScreen(
                         )
                     }
                 }) {
-                    ListCard(playersState, Modifier.fillMaxWidth()) { player, padding ->
-                        Text(player.name, Modifier.padding(padding))
+                    ListCard(Modifier.fillMaxWidth()) {
+                        items(playersState) { player, padding ->
+                            Text(player.name, Modifier.padding(padding))
+                        }
                     }
                 }
                 SectionWithHeader(stringResource(R.string.main_games_header)) {
-                    ListCard(gameListState.games, Modifier.fillMaxWidth()) { game, padding ->
-                        Column(
-                            Modifier
-                                .clickable(onClick = { onNavigateToGame(game.id) })
-                                .fillMaxWidth()
-                                .padding(padding)
-                        ) {
-                            Text(game.title, style = MaterialTheme.typography.titleMedium)
-                            for (player in game.players) {
-                                Text(
-                                    stringResource(
-                                        R.string.main_game_list_player_plus_score,
-                                        player.name,
-                                        player.score
-                                    ), style = MaterialTheme.typography.bodyMedium
-                                )
+                    ListCard(Modifier.fillMaxWidth()) {
+                        items(gameListState.games) { game, padding ->
+                            Column(
+                                Modifier
+                                    .clickable(onClick = { onNavigateToGame(game.id) })
+                                    .fillMaxWidth()
+                                    .padding(padding)
+                            ) {
+                                Text(game.title, style = MaterialTheme.typography.titleMedium)
+                                for (player in game.players) {
+                                    Text(
+                                        stringResource(
+                                            R.string.main_game_list_player_plus_score,
+                                            player.name,
+                                            player.score
+                                        ), style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
                             }
                         }
                     }

@@ -34,4 +34,6 @@
     <string name="set_score_score_label">%1$s: Hole %2$s</string>
     <string name="set_score_set_score_button">Set Score</string>
     <string name="title_activity_game">GameActivity</string>
+    <string name="player_list_show_archived_icon_description">Show Archived</string>
+    <string name="player_list_hide_archived_icon_description">Hide Archived</string>
 </resources>

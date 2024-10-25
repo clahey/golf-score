@@ -1,15 +1,20 @@
 package net.clahey.golfscore.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Unarchive
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -42,6 +47,7 @@ fun PlayerListScreen(
     onNavigateToPlayerUnarchive: (Int) -> Unit,
 ) {
     val players by playerListViewModel.players.collectAsState(initial = listOf())
+    val uiState by playerListViewModel.uiState.collectAsState()
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = { onNavigateToPlayerAdd() }) {
             Icon(Icons.Filled.Add, stringResource(R.string.player_list_add_player_icon_description))
@@ -60,50 +66,106 @@ fun PlayerListScreen(
                 }
             })
     }) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            ListCard(players.filter { !it.archived }, Modifier.fillMaxWidth()) { player, padding ->
-                Row (Modifier.padding(padding)) {
-                    Text(
-                        player.name,
-                        Modifier
-                            .align(Alignment.CenterVertically)
-                            .weight(1f)
-                    )
-                    IconButton(
-                        onClick = { onNavigateToPlayerEdit(player.id) },
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    ) {
-                        Icon(Icons.Filled.Edit,
-                            stringResource(
-                                R.string.player_list_edit_player_icon_description,
-                                player.name
-                            ))
-                    }
-                    IconButton(
-                        onClick = { onNavigateToPlayerArchive(player.id) },
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    ) {
-                        Icon(Icons.Filled.Archive,
-                            stringResource(
-                                R.string.player_list_archive_player_icon_description,
-                                player.name
-                            ))
+        Box(Modifier.padding(padding)) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                ListCard {
+                    items(players.filter { !it.archived }) { player, padding ->
+                        Row(Modifier.padding(padding)) {
+                            Text(
+                                player.name,
+                                Modifier
+                                    .align(Alignment.CenterVertically)
+                                    .weight(1f)
+                            )
+                            IconButton(
+                                onClick = { onNavigateToPlayerEdit(player.id) },
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                            ) {
+                                Icon(
+                                    Icons.Filled.Edit,
+                                    stringResource(
+                                        R.string.player_list_edit_player_icon_description,
+                                        player.name
+                                    )
+                                )
+                            }
+                            IconButton(
+                                onClick = { onNavigateToPlayerArchive(player.id) },
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                            ) {
+                                Icon(
+                                    Icons.Filled.Archive,
+                                    stringResource(
+                                        R.string.player_list_archive_player_icon_description,
+                                        player.name
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
-            }
-            val archived = players.filter { it.archived }
-            if (archived.isNotEmpty()) {
-                Text(stringResource(R.string.player_list_archived_header), style = MaterialTheme.typography.titleMedium)
-                for (player in players.filter { it.archived }) {
-                    Row {
-                        Text(player.name)
-                        Icon(
-                            Icons.Filled.Unarchive,
-                            stringResource(
-                                R.string.player_list_unarchive_player_icon_description,
-                                player.name
-                            ),
-                            modifier = Modifier.clickable { onNavigateToPlayerUnarchive(player.id) })
+                val archived = players.filter { it.archived }
+                if (archived.isNotEmpty()) {
+                    ListCard {
+                        item { padding ->
+                            Row(
+                                Modifier
+                                    .padding(padding)
+                                    .clickable {
+                                        playerListViewModel.setArchiveExpanded(!uiState.archiveExpanded)
+                                    }) {
+                                Text(
+                                    stringResource(R.string.player_list_archived_header),
+                                    Modifier
+                                        .weight(1f)
+                                        .align(Alignment.CenterVertically),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                IconButton({ playerListViewModel.setArchiveExpanded(!uiState.archiveExpanded) }) {
+                                    if (!uiState.archiveExpanded) {
+                                        Icon(
+                                            Icons.Filled.ExpandMore,
+                                            stringResource(R.string.player_list_show_archived_icon_description)
+                                        )
+                                    } else {
+                                        Icon(
+                                            Icons.Filled.ExpandLess,
+                                            stringResource(R.string.player_list_hide_archived_icon_description)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        if (uiState.archiveExpanded) {
+                            items(archived) { player, padding ->
+                                Row(Modifier.padding(padding)) {
+                                    Text(
+                                        player.name,
+                                        Modifier
+                                            .weight(1f)
+                                            .align(Alignment.CenterVertically)
+                                    )
+                                    IconButton(onClick = {
+                                        onNavigateToPlayerUnarchive(player.id)
+                                    }) {
+                                        Icon(
+                                            Icons.Filled.Unarchive,
+                                            stringResource(
+                                                R.string.player_list_unarchive_player_icon_description,
+                                                player.name
+                                            ),
+                                            Modifier.align(Alignment.CenterVertically)
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
