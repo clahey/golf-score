@@ -3,6 +3,7 @@ package net.clahey.widgets.compose
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,7 +35,7 @@ fun ColumnWithScrim(
     scrimActive: Boolean,
     modifier: Modifier = Modifier,
     onComplete: (() -> Unit)? = null,
-    scrimColor: Color = Color.White.copy(alpha = 0.5f),
+    scrimColor: Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f),
     spacing: Dp = 0.dp,
     padding: Dp = 0.dp,
     block: @Composable() (ColumnWithScrimScope.() -> Unit),
