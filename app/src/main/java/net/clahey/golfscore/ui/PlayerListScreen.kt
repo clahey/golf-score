@@ -56,15 +56,14 @@ fun PlayerListScreen(
         TopAppBar(colors = topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.primary,
-        ), title = { Text(stringResource(R.string.player_list_page_title)) },
-            navigationIcon = {
-                IconButton(onClick = { onNavigateBack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.generic_back_icon_description)
-                    )
-                }
-            })
+        ), title = { Text(stringResource(R.string.player_list_page_title)) }, navigationIcon = {
+            IconButton(onClick = { onNavigateBack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.generic_back_icon_description)
+                )
+            }
+        })
     }) { padding ->
         Box(Modifier.padding(padding)) {
             Column(
@@ -87,8 +86,7 @@ fun PlayerListScreen(
                                 modifier = Modifier.align(Alignment.CenterVertically)
                             ) {
                                 Icon(
-                                    Icons.Filled.Edit,
-                                    stringResource(
+                                    Icons.Filled.Edit, stringResource(
                                         R.string.player_list_edit_player_icon_description,
                                         player.name
                                     )
@@ -99,8 +97,7 @@ fun PlayerListScreen(
                                 modifier = Modifier.align(Alignment.CenterVertically)
                             ) {
                                 Icon(
-                                    Icons.Filled.Archive,
-                                    stringResource(
+                                    Icons.Filled.Archive, stringResource(
                                         R.string.player_list_archive_player_icon_description,
                                         player.name
                                     )
