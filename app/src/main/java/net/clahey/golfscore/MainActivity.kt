@@ -86,6 +86,20 @@ fun MainScreen() {
                 onNavigateToGameAdd = { navController.navigate(GameConfigRoute(null)) },
                 onNavigateToPlayerAdd = { navController.navigate(PlayerConfigRoute(null)) },
                 onNavigateToPlayerEdit = { id -> navController.navigate(PlayerConfigRoute(id)) },
+                onNavigateToPlayerArchive = { id: Int ->
+                    navController.navigate(
+                        PlayerArchiveRoute(
+                            id, true
+                        )
+                    )
+                },
+                onNavigateToPlayerUnarchive = { id: Int ->
+                    navController.navigate(
+                        PlayerArchiveRoute(
+                            id, false
+                        )
+                    )
+                },
                 onNavigateToPlayerList = { navController.navigate(PlayerListRoute) },
                 onNavigateToAbout = { navController.navigate(AboutRoute) },
             )

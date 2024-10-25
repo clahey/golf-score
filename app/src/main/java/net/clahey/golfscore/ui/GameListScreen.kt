@@ -1,9 +1,9 @@
 package net.clahey.golfscore.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -24,11 +24,13 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import net.clahey.golfscore.R
+import net.clahey.widgets.compose.ColumnWithScrim
 import net.clahey.widgets.compose.ListCard
 import net.clahey.widgets.compose.SectionWithHeader
 
@@ -39,6 +41,8 @@ fun GameListScreen(
     onNavigateToGameAdd: () -> Unit,
     onNavigateToPlayerAdd: () -> Unit,
     onNavigateToPlayerEdit: (Int) -> Unit,
+    onNavigateToPlayerArchive: (Int) -> Unit,
+    onNavigateToPlayerUnarchive: (Int) -> Unit,
     onNavigateToAbout: () -> Unit,
     gameListViewModel: GameListViewModel = viewModel(),
     onNavigateToPlayerList: () -> Unit,
@@ -51,6 +55,8 @@ fun GameListScreen(
     val playersState by gameListViewModel.players.collectAsState(
         initial = listOf()
     )
+    val activePlayers = playersState.filter { !it.archived }
+    val uiState by gameListViewModel.uiState.collectAsState()
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = { onNavigateToGameAdd() }) {
             Icon(Icons.Filled.Add, stringResource(R.string.main_add_game_icon_description))
@@ -72,26 +78,79 @@ fun GameListScreen(
         )
     }) { innerPadding ->
         Box(Modifier.padding(innerPadding)) {
-            Column(
-                Modifier
-                    .padding(8.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ColumnWithScrim(
+                uiState.playerEditActive,
+                Modifier.verticalScroll(rememberScrollState()),
+                onComplete = { gameListViewModel.setPlayerEditState(false) },
+                padding = 8.dp,
+                spacing = 16.dp
             ) {
-                SectionWithHeader(stringResource(R.string.main_players_header), actions = {
-                    IconButton(onNavigateToPlayerList) {
-                        Icon(
-                            Icons.Filled.Edit,
-                            stringResource(R.string.main_edit_players_icon_description)
-                        )
-                    }
-                }) {
+                SectionWithHeader(stringResource(R.string.main_players_header),
+                    Modifier.aboveScrim(),
+                    actions = {
+                        IconButton({
+                            val useInlineEdit = false
+                            if (useInlineEdit) {
+                                gameListViewModel.setPlayerEditState(!uiState.playerEditActive)
+                            } else {
+                                onNavigateToPlayerList()
+                            }
+                        }) {
+                            Icon(
+                                Icons.Filled.Edit,
+                                stringResource(R.string.main_edit_players_icon_description)
+                            )
+                        }
+                    }) {
                     ListCard(Modifier.fillMaxWidth()) {
-                        items(playersState) { player, padding ->
-                            Text(player.name, Modifier.padding(padding))
+                        items(activePlayers) { player, padding ->
+                            Row(Modifier.padding(padding)) {
+                                Text(
+                                    player.name,
+                                    Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .weight(1f)
+                                )
+                                if (uiState.playerEditActive) {
+                                    IconButton(
+                                        onClick = { onNavigateToPlayerEdit(player.id) },
+                                        Modifier.align(Alignment.CenterVertically)
+                                    ) {
+                                        Icon(Icons.Filled.Edit, "Edit Player")
+                                    }
+                                }
+                            }
+                        }
+                        if (uiState.playerEditActive) {
+                            item { padding ->
+                                Row(Modifier.padding(padding)) {
+                                    Text(
+                                        "Add Player",
+                                        Modifier
+                                            .align(Alignment.CenterVertically)
+                                            .weight(1f)
+                                    )
+                                    IconButton(
+                                        onClick = { onNavigateToPlayerAdd() },
+                                        Modifier.align(Alignment.CenterVertically)
+                                    ) {
+                                        Icon(Icons.Filled.Add, "Add Player")
+                                    }
+                                }
+                            }
                         }
                     }
+                    if (uiState.playerEditActive) {
+                        ArchivedPlayers(
+                            playersState.filter { it.archived },
+                            uiState.archivedPlayersExpanded,
+                            gameListViewModel::setArchivedPlayersExpanded,
+                            Modifier,
+                            onNavigateToPlayerUnarchive
+                        )
+                    }
                 }
+
                 SectionWithHeader(stringResource(R.string.main_games_header)) {
                     ListCard(Modifier.fillMaxWidth()) {
                         items(gameListState.games) { game, padding ->
